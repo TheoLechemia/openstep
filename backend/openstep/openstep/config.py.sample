@@ -1,0 +1,10 @@
+DATABASES = {
+    "default": {
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        "NAME": "openstepdb",
+        "USER": "geonatadmin",
+        "PASSWORD": "monpassachanger",
+        "HOST": "127.0.0.1",
+        "PORT": "5432",
+    }
+}
