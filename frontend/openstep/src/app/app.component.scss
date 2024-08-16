@@ -1,0 +1,18 @@
+mat-toolbar {
+    border-bottom: solid 1px;
+}
+
+#my-container {
+    height: calc(
+        100vh - var(--mat-toolbar-standard-height)
+      )
+}
+
+.container {
+    width: 100%;
+    max-width: 100%!important;
+}
+
+#app-name {
+    cursor: pointer;
+}

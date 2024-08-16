@@ -1,9 +1,25 @@
+from typing import Any, Mapping
+from django import forms
 from django.contrib import admin
 from django.contrib.gis.admin import GISModelAdmin
+from django.core.files.base import File
+from django.db.models.base import Model
+from django.forms.utils import ErrorList
 from django.utils.safestring import mark_safe
+from tinymce.widgets import TinyMCE
+
 
 
 from step.models import Step, Travel, Media
+
+
+class StepForm(forms.ModelForm):
+    class Meta:
+        widgets = {
+            "description": TinyMCE()
+        }
+
+
 
 class MediaInline(admin.TabularInline):
     model = Media
@@ -19,6 +35,7 @@ class MediaInline(admin.TabularInline):
 
 
 class StepAdmin(GISModelAdmin):
+    form = StepForm
     inlines = [MediaInline]
     list_display = ("name", "description", "media_preview",)
 

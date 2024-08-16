@@ -1,0 +1,27 @@
+<div class="row main-container">
+    <div class="col-12 col-md-8 order-md-2">
+      <app-map [geojson]="stepsGeoJson" ></app-map>
+    </div>
+    <div id="steps-container" class="col-12 col-md-4 order-md-1">
+        @for (step of stepsList; track step.id) {
+            <mat-card [id]="step.properties.ids" class="mt-2" appearance="outlined">
+                <mat-card-content>
+                    <h3>  
+                        <mat-icon fontIcon="location_on"></mat-icon>
+                         {{step.properties.name}} 
+                    </h3>
+    
+                    <p class="text-muted"> 
+                        {{step.properties.country}} - {{step.properties.state}} |
+                         {{step.properties.date}} </p>
+                    <p [innerHTML]="step.properties.description" ></p>
+                    @if(step.properties.medias.length > 0) {
+                        @for(image of step.properties.medias; track image.id) {
+                            <img width="100%" src="{{image.media_file}}" alt="">
+                        }
+                    }
+                </mat-card-content>
+              </mat-card>
+        }
+    </div>
+</div>

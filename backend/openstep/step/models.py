@@ -7,8 +7,8 @@ class Travel(models.Model):
     name = models.CharField(max_length=200)
     description =  models.CharField()
     start_date = models.DateField()
-    end_date = models.DateField()
-    main_photo = models.CharField(blank=True, null=True)
+    end_date = models.DateField(blank=True, null=True)
+    main_photo = models.FileField(upload_to="static", verbose_name=_("File"))
 
     def __str__(self) -> str:
         return self.name
@@ -16,8 +16,13 @@ class Travel(models.Model):
 
 class Step(models.Model):
     name = models.CharField()
+    date = models.DateField()
     location = models.PointField(srid=4326, verbose_name=_("Location"))
     description = models.CharField(blank=True, null=True)
+    travel = models.ForeignKey(
+        Travel, 
+        on_delete=models.CASCADE, 
+    )
 
     def __str__(self) -> str:
         return self.name

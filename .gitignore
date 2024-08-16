@@ -145,6 +145,8 @@ venv.bak/
 
 **/static/*
 
+**/.vscode
+
 # mypy
 .mypy_cache/
 .dmypy.json

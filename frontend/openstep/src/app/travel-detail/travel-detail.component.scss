@@ -1,0 +1,14 @@
+.main-container {
+    background-color: #ebeff5;
+}
+
+
+
+@media (min-width: 768px) {
+    #steps-container {
+        height: calc(
+            100vh - var(--mat-toolbar-standard-height)
+          );
+        overflow-y: scroll;
+    }
+}
