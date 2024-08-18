@@ -15,7 +15,7 @@ export class TravelsComponent implements OnInit {
   constructor(private _api: ApiService) {}
 
   ngOnInit(): void {
-    this._api.getTravel().subscribe((travels: Array<any>) => {
+    this._api.getTravels().subscribe((travels: Array<any>) => {
       this.travels = travels;
     })
   }

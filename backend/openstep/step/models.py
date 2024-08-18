@@ -22,6 +22,7 @@ class Step(models.Model):
     travel = models.ForeignKey(
         Travel, 
         on_delete=models.CASCADE, 
+        related_name="steps",
     )
 
     def __str__(self) -> str:

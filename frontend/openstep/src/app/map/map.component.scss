@@ -6,7 +6,7 @@
 @media (min-width: 768px) {
     #map {
         height: calc(
-            100vh - var(--mat-toolbar-standard-height)
+            60vh - var(--mat-toolbar-standard-height)
           )
     }
 }

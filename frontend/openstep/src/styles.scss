@@ -2,19 +2,40 @@
 // Custom Theming for Angular Material
 // For more information: https://material.angular.io/guide/theming
 @use '@angular/material' as mat;
-// Plus imports for other components in your app.
+@use "./../m3-theme.scss";
+
+@include mat.core();
+
+// :root {
+//   @include mat.all-component-themes(m3-theme.$dark-theme);
+//   // @include mat.core-theme(m3-theme.$light-theme);
+//   // @include mat.button-theme(m3-theme.$light-theme);
+// }
+
+
 
 // Include the common styles for Angular Material. We include this here so that you only
 // have to load a single css file for Angular Material in your app.
 // Be sure that you only ever include this mixin once!
-@include mat.core();
 
 // Define the theme object.
+// $openstep-theme: mat.define-theme((
+//   color: (
+//     theme-type: light,
+//     primary: mat.$azure-palette,
+//     tertiary: mat.$blue-palette,
+//   ),
+//   density: (
+//     scale: 0,
+//   )
+// ));
+
+
 $openstep-theme: mat.define-theme((
   color: (
     theme-type: light,
-    primary: mat.$azure-palette,
-    tertiary: mat.$blue-palette,
+    primary: m3-theme.$primary,
+    tertiary: m3-theme.$tertiary,
   ),
   density: (
     scale: 0,
@@ -26,6 +47,10 @@ $openstep-theme: mat.define-theme((
 // that you are using.
 :root {
   @include mat.all-component-themes($openstep-theme);
+}
+
+body {
+  background-color: var(--mat-app-background-color);
 }
 
 // Comment out the line below if you want to use the pre-defined typography utility classes.
@@ -50,14 +75,14 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   width: 100%;
   height: 100%;
   transform: rotate(-44deg);
-  background-color: var(--mdc-fab-container-color);
+  background-color: var(--mdc-filled-button-container-color);
   color: var(--mat-fab-foreground-color);
-  box-shadow: var(--mdc-extended-fab-container-elevation-shadow);
+  // box-shadow: var(--mdc-extended-fab-container-elevation-shadow);
 }
 
 .observation-marker-container:hover {
   transition: 0.3s ease-in-out;
-  box-shadow: 0 0 0 4px #0099e5, 0 0 0 8px rgba(0, 153, 229, .5);
+  box-shadow: 0 0 0 4px var(--mdc-filled-button-container-color), 0 0 0 8px var(--mdc-fab-container-color);
 }
 
 .observation-marker-container:hover>.hover-detail{
@@ -105,4 +130,38 @@ padding: 2rem;
 
 .leaflet-popup-content-wrapper, .leaflet-popup-tip {
   background-color: transparent!important;
+}
+
+mat-icon {
+  color: var(--mdc-filled-button-container-color)!important;
+}
+
+.primary-color {
+  color: var(--mdc-filled-button-container-color)!important;
+
+}
+
+
+.icon-text {
+  display: flex !important;
+  align-items: center;
+}
+
+
+
+.mat-icon {
+  vertical-align: middle;
+}
+
+.polyline-primary {
+  stroke: var(--mdc-filled-button-container-color);
+  fill: none;
+  stroke-dasharray: 10,10; 
+  stroke-width: 5;  
+}
+
+
+.button-see-step {
+  position: absolute;
+  bottom: 5%;
 }

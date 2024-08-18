@@ -1,27 +1,74 @@
-<div class="row main-container">
-    <div class="col-12 col-md-8 order-md-2">
+<div class="main-container">
+    <div id="travel-container">
+        <mat-card id="travel-card">
+            <img class="travel-img" style="height: 80%;" #img mat-card-image src="{{travel.main_photo}}" alt="">
+            <div class="inner-card ">
+                <span  class="icon-text bold" >
+                    <mat-icon>explore</mat-icon>
+                    {{travel.name}} <br>
+                </span>
+                <span class="icon-text text-muted">
+                    <mat-icon>edit</mat-icon>
+                    {{travel.description}}
+                </span>
+            </div>
+        </mat-card>
+    </div>
       <app-map [geojson]="stepsGeoJson" ></app-map>
-    </div>
-    <div id="steps-container" class="col-12 col-md-4 order-md-1">
-        @for (step of stepsList; track step.id) {
-            <mat-card [id]="step.properties.ids" class="mt-2" appearance="outlined">
-                <mat-card-content>
-                    <h3>  
-                        <mat-icon fontIcon="location_on"></mat-icon>
-                         {{step.properties.name}} 
-                    </h3>
-    
-                    <p class="text-muted"> 
-                        {{step.properties.country}} - {{step.properties.state}} |
-                         {{step.properties.date}} </p>
-                    <p [innerHTML]="step.properties.description" ></p>
-                    @if(step.properties.medias.length > 0) {
-                        @for(image of step.properties.medias; track image.id) {
-                            <img width="100%" src="{{image.media_file}}" alt="">
-                        }
-                    }
-                </mat-card-content>
-              </mat-card>
-        }
-    </div>
+
 </div>
+
+
+
+
+<div id="caroussel-container" class="cover caroussel-block mt-2">
+    @if(stepsList.length > 0) {
+        <button (click)="right()" class="left"  mat-mini-fab>
+            <mat-icon>chevron_left</mat-icon>
+        </button>
+
+    }
+    <div class="caroussel height-100"  #slider > 
+    @for (step of stepsList; track step.id) {
+        <mat-card class="step-card" >
+            <img (click)="openDialog(step)" class="travel-img" style="height: 80%;" #img mat-card-image src="{{step.properties.first_media.media_file}}" alt="">
+            <div class="gradian">
+
+            </div>
+            <div class="float-info">
+                <div class="step-info-overlay">
+                    <h4> {{step.properties.name}} </h4>
+                    <span> {{step.properties.country}}  </span>
+
+                </div>
+            </div>
+
+            <mat-card-actions>
+                <span class="me-4 icon-text">
+                    <mat-icon >chat</mat-icon> <span class="text-muted"> 1 </span> 
+                </span>
+                <span class="me-4">
+                    <mat-icon >photo_camera</mat-icon> <span class="text-muted"> {{step.properties.medias.length}} </span> 
+                </span>
+                <span class="me-4">
+                    <mat-icon >calendar_month</mat-icon> <span class="text-muted"> {{step.properties.date  |date: 'dd MMM yyyy' }} </span> 
+                </span>
+
+                <button mat-icon-button class="icon-text" >
+                    <mat-icon >map</mat-icon>
+                  </button>
+                <button style="display: none;"  mat-flat-button>  test</button>
+            </mat-card-actions>
+                
+        </mat-card>
+    }
+
+    
+    </div>
+    @if(stepsList.length > 0) {
+        <button (click)="left()" class="right"  mat-mini-fab>
+            <mat-icon>chevron_right</mat-icon>
+        </button>
+    }
+</div>
+    

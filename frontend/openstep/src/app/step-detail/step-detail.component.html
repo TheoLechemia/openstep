@@ -1,0 +1,31 @@
+<h2 mat-dialog-title> {{data.step.properties.name}}  </h2>
+
+  <mat-dialog-content class="mat-typography">
+    <div class="icon-text mb-2">
+        <mat-icon class="me-1">location_on</mat-icon>
+        <span> {{data.step.properties.country}} - {{data.step.properties.state}} </span>
+    </div>
+    <span class="icon-text mb-4">
+        <mat-icon class="me-1">calendar_month</mat-icon>
+        <span> Day {{data.step.properties.dayOfStep}} - {{data.step.properties.date  |date: 'dd MMM yyyy' }} </span>
+    </span>
+    
+
+    <p class="mt-2" [innerHTML]="data.step.properties.description" >
+    </p>
+    
+
+
+    
+</mat-dialog-content>
+
+<carousel>
+    @for(media of data.step.properties.medias; track data.step.properties.medias.id) {
+        
+        <slide>
+            <img src="{{media.media_file}}" alt="second slide" style="display: block; width: 100%;">
+        </slide>
+        <!-- <img class="d-block w-100" src="{{media.media_file}}" alt="First slide"> -->
+    }
+    
+</carousel>

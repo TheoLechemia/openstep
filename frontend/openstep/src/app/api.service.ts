@@ -9,12 +9,20 @@ export class ApiService {
 
   constructor(private _http: HttpClient) { }
 
-  getTravel(): Observable<any> {
+  getTravels(): Observable<any> {
     return this._http.get<any>("http://127.0.0.1:8000/api/travels").pipe(
       map(resp => {
         return resp["results"]
       })
     )
+  }
+
+  getTravel(idTravel:number): Observable<any> {
+    return this._http.get<any>(`http://127.0.0.1:8000/api/travels/${idTravel}`)
+  }
+
+  getStep(idStep:number): Observable<any> {
+    return this._http.get<any>(`http://127.0.0.1:8000/api/step/${idStep}`)
   }
 
   getSteps(idTravel: number): Observable<any>  {
