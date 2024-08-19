@@ -1,13 +1,5 @@
-
 #map {
-    height:60vh;
+    height:100%;
 }
 
-@media (min-width: 768px) {
-    #map {
-        height: calc(
-            60vh - var(--mat-toolbar-standard-height)
-          )
-    }
-}
 

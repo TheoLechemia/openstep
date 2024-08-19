@@ -1,4 +1,4 @@
-<div class="main-container">
+<div id="map-container">
     <div id="travel-container">
         <mat-card id="travel-card">
             <img class="travel-img" style="height: 80%;" #img mat-card-image src="{{travel.main_photo}}" alt="">
@@ -14,7 +14,7 @@
             </div>
         </mat-card>
     </div>
-      <app-map [geojson]="stepsGeoJson" ></app-map>
+      <app-map [geojson]="travel.steps" [pointToLayer]="pointToLayer.bind(this)"  ></app-map>
 
 </div>
 
@@ -22,14 +22,12 @@
 
 
 <div id="caroussel-container" class="cover caroussel-block mt-2">
-    @if(stepsList.length > 0) {
         <button (click)="right()" class="left"  mat-mini-fab>
             <mat-icon>chevron_left</mat-icon>
         </button>
 
-    }
     <div class="caroussel height-100"  #slider > 
-    @for (step of stepsList; track step.id) {
+    @for (step of travel?.steps?.features; track step.id) {
         <mat-card class="step-card" >
             <img (click)="openDialog(step)" class="travel-img" style="height: 80%;" #img mat-card-image src="{{step.properties.first_media.media_file}}" alt="">
             <div class="gradian">
@@ -65,10 +63,8 @@
 
     
     </div>
-    @if(stepsList.length > 0) {
         <button (click)="left()" class="right"  mat-mini-fab>
             <mat-icon>chevron_right</mat-icon>
         </button>
-    }
 </div>
     

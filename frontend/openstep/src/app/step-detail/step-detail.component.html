@@ -19,13 +19,13 @@
     
 </mat-dialog-content>
 
-<carousel>
-    @for(media of data.step.properties.medias; track data.step.properties.medias.id) {
+    <carousel>
+        @for(media of data.step.properties.medias; track data.step.properties.medias.id) {
+            
+            <slide>
+                <img src="{{media.media_file}}" alt="second slide" style="display: block; width: 100%;">
+            </slide>
+            <!-- <img class="d-block w-100" src="{{media.media_file}}" alt="First slide"> -->
+        }
         
-        <slide>
-            <img src="{{media.media_file}}" alt="second slide" style="display: block; width: 100%;">
-        </slide>
-        <!-- <img class="d-block w-100" src="{{media.media_file}}" alt="First slide"> -->
-    }
-    
-</carousel>
+    </carousel>

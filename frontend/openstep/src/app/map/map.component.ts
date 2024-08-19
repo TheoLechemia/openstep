@@ -13,6 +13,7 @@ import 'leaflet-polylinedecorator';
 })
 export class MapComponent implements OnInit, OnChanges {
   @Input() geojson: any;
+  @Input() pointToLayer: any;
   public map: L.Map;
   ngOnInit(): void {
     
@@ -24,55 +25,12 @@ export class MapComponent implements OnInit, OnChanges {
     }).addTo(this.map);  
   }
 
-  generatePopup(feature) {
-    const hasMedias = feature.properties.medias.length > 0;    
-    let firstMedia = null;
-    let stepDay =  new Date(feature.properties.date);
-    let now = new Date();
-    console.log(stepDay);
-    let differenceInTime = now.getTime() - stepDay.getTime();
-    let diffenreceInDay = Math.round(differenceInTime / (1000 * 3600 * 24));
-    if(hasMedias) {
-      firstMedia = feature.properties.medias[0].media_file
-    }    
-    return `
-          <div class="img-container" style="background-image: url(${firstMedia});">
-            <div class="overlay">
-              <h4> ${feature.properties.name} </h4>
-              <p> ${feature.properties.date} - ${diffenreceInDay} days ago </p>
-              <div class="button-see-step">
-                <button class="mdc-button mdc-button--unelevated mat-mdc-unelevated-button mat-unthemed mat-mdc-button-base" > See this step</button>
-              </div>
-            </div>
-    
-    `
-  }
-
 
 
   ngOnChanges(changes: SimpleChanges): void {
     if(changes["geojson"] && changes["geojson"].currentValue) {
       const layer = L.geoJson(changes["geojson"].currentValue, {
-        pointToLayer : (feature, latLng) => {
-          let icon = L.divIcon({
-            html:`<div class="observation-marker-container">
-
-                </div>
-              </div>`,
-            className: 'observation-marker',
-            iconSize: 32,
-            iconAnchor: [18, 28],
-          } as any);
-          const marker = L.marker(latLng, {icon: icon});
-          marker.bindPopup(this.generatePopup(feature));
-          marker.on('mouseover', function (e) {
-              this.openPopup();
-          });
-        //   marker.on('mouseout', function (e) {
-        //     this.closePopup();
-        // });
-          return marker;
-        }
+        pointToLayer : this.pointToLayer
       });
       if(this.map) {
         this.map.addLayer(layer);

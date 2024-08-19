@@ -25,6 +25,9 @@ class Step(models.Model):
         related_name="steps",
     )
 
+    class Meta:
+        ordering = ["date"]
+
     def __str__(self) -> str:
         return self.name
     
