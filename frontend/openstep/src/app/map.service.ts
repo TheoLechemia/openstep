@@ -40,7 +40,7 @@ export class MapService {
     this.map.addLayer(polyline);
       var markerPatterns = L.polylineDecorator(polyline, {
         patterns: [
-            {offset: 25, repeat: 120, symbol: L.Symbol.arrowHead({pixelSize: 15, pathOptions: {fillOpacity: 1, weight: 0, color: "#03530a",}})}
+            {offset: 25, repeat: 120, symbol: L.Symbol.arrowHead({pixelSize: 15, pathOptions: {fillOpacity: 1, weight: 0, color: "#0c4122",}})}
 
         ]
     }).addTo(this.map);

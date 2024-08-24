@@ -95,7 +95,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 	50% { box-shadow: 0 0 0 6px var(--mdc-fab-container-color);} 
 }
 @keyframes flash {
-	50% { box-shadow: 0 0 0 4px rgb(255, 196, 0), 0 0 0 6px rgba(255, 196, 0, 0.527);} 
+	50% { box-shadow: 0 0 0 6px rgb(255, 136, 0), 0 0 0 8px rgba(255, 136, 0, 0.527);} 
 }
 .observation-marker-container:hover>.hover-detail{
 display: block;

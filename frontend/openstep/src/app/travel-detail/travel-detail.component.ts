@@ -88,7 +88,7 @@ export class TravelDetailComponent implements OnInit {
   pointToLayer(feature, latLng) {    
     const marker = this._mapService.pointToLayer(feature, latLng);
     marker.bindPopup(this.generatePopup(feature));
-    marker.on('mouseover', function (e) {
+    marker.on('click', function (e) {
         this.openPopup();
     });
     return marker;
