@@ -61,14 +61,14 @@
 .left {
     z-index:1000;
     position: absolute;
-    left: 0;
+    left: 1%;
     top: 35%;
 }
 
 .right {
     z-index:1000;
     position: absolute;
-    right: 0;
+    right: 1%;
     top: 35%;
 }
 
@@ -120,7 +120,7 @@
 
 
 .step-info-overlay {
-    // width: 100%;
+    border-radius: var(--mdc-elevated-card-container-shape, var(--mat-app-corner-medium));
     padding-top:0.5rem;
     padding-left: 0.5rem;
     background: linear-gradient(to top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.596));

@@ -11,19 +11,31 @@ class MediaSerializer(serializers.ModelSerializer):
         model = Media
         fields = ('id', 'legend','media_file',)
 
+class TravelSerializerNoStep(serializers.ModelSerializer):
+    class Meta:
+        model = Travel
+        fields = ["name", "id", "description"]
+
 class StepSerializer(gis_serializers.GeoFeatureModelSerializer):
     medias = MediaSerializer(many=True)
     first_media = MediaSerializer()
+    travel = TravelSerializerNoStep()
+
     class Meta:
         model = Step
-        fields = ('id', 'name', 'location', 'description', 'date', 'medias', 'first_media')
+        fields = (
+            'travel', 'id', 'name', 'location', 'description', 'date', 'medias', 'first_media', 'day_of_travel', "country", "state")
         geo_field = "location"
+
+
 
 class TravelSerializer(serializers.ModelSerializer):
     steps = StepSerializer(many=True)
     class Meta:
         model = Travel
         fields = "__all__"
+
+# StepSerializer._declared_fields["travel"] = TravelSerializer(context={"exclude_fields": ["steps"]})
 
 class StepViewSet(viewsets.ModelViewSet):
     serializer_class = StepSerializer

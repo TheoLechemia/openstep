@@ -1,31 +1,65 @@
-<h2 mat-dialog-title> {{data.step.properties.name}}  </h2>
 
-  <mat-dialog-content class="mat-typography">
-    <div class="icon-text mb-2">
-        <mat-icon class="me-1">location_on</mat-icon>
-        <span> {{data.step.properties.country}} - {{data.step.properties.state}} </span>
-    </div>
-    <span class="icon-text mb-4">
-        <mat-icon class="me-1">calendar_month</mat-icon>
-        <span> Day {{data.step.properties.dayOfStep}} - {{data.step.properties.date  |date: 'dd MMM yyyy' }} </span>
-    </span>
-    
+    <div class="row height-100 g-0">
+        <div class="col-12 col-md-5 order-md-2" id="map-container">
+            <app-map [geojson]="step" ></app-map>
+        </div>
 
-    <p class="mt-2" [innerHTML]="data.step.properties.description" >
-    </p>
-    
+        @if(step) {
+            <div class="col-12 col-md-7 order-md-1" id="detail-container">
+                <div class="description-padding">
+                    <a [routerLink]="['/travel', step.properties.travel.id]">
+                        <small class="me-2 primary-color">  {{ step.properties.travel.name}} </small>
+                    </a>
+                        <h3 > {{step.properties.name}}  </h3>
 
-
-    
-</mat-dialog-content>
-
-    <carousel>
-        @for(media of data.step.properties.medias; track data.step.properties.medias.id) {
             
-            <slide>
-                <img src="{{media.media_file}}" alt="second slide" style="display: block; width: 100%;">
-            </slide>
-            <!-- <img class="d-block w-100" src="{{media.media_file}}" alt="First slide"> -->
-        }
+                    <div class="icon-text mb-2">
+                        <mat-icon class="me-1">location_on</mat-icon>
+                        <span> {{step.properties.country}} - {{step.properties.state}} </span>
+                    </div>
+                    <span class="icon-text mb-4">
+                        <mat-icon class="me-1">calendar_month</mat-icon>
+                        <span> Day {{step.properties.day_of_travel}} - {{step.properties.date  |date: 'dd MMM yyyy' }} </span>
+                    </span>
+                    
         
-    </carousel>
+                
+                    <p class="mt-2" [innerHTML]="step.properties.description" >
+        
+                    <p style="display: none;">medias</p>
+                </div>
+                <carousel>
+                    @for(media of step.properties.medias; track step.properties.medias.id) {
+                        
+                        <slide>
+                            <img src="{{media.media_file}}" alt="second slide" style="display: block; width: 100%;">
+                        </slide>
+                    }
+                    
+                </carousel>
+                
+                <div class="description-padding" >
+
+                    <mat-divider class="mt-4 mb-4 ps-1"></mat-divider>
+                    <mat-list>
+                        @for(comment of comments; track comment) {
+                            <mat-list-item>
+                                <mat-icon matListItemIcon>mood</mat-icon>
+                                <div matListItemTitle>{{comment.message}}</div>
+                                <div matListItemLine> <small> {{comment.date}}</small> </div>
+                              </mat-list-item>
+                        }
+
+                    </mat-list>
+
+                    <mat-form-field appearance="outline">
+                        <mat-label>Comment</mat-label>
+                        <input matInput placeholder="Comment">
+                        <mat-icon matSuffix>comment</mat-icon>
+                      </mat-form-field>
+                </div>
+                
+            </div>
+        }
+    </div>
+

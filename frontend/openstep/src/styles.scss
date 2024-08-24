@@ -81,16 +81,21 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 }
 
 .last-step{
-  // box-shadow: 0 0 0 4px var(--mdc-filled-button-container-color), 0 0 0 8px var(--mdc-fab-container-color);
 	-webkit-animation: flash linear 1.5s infinite;
 	animation: flash linear 1.5s infinite;
 }
+
+.selected-marker {
+    box-shadow: 0 0 0 4px rgb(255, 196, 0), 0 0 0 6px rgba(255, 196, 0, 0.527);
+}
+
+// #013d2e
 
 @-webkit-keyframes flash {
 	50% { box-shadow: 0 0 0 6px var(--mdc-fab-container-color);} 
 }
 @keyframes flash {
-	50% { box-shadow: 0 0 0 6px rgba(255, 255, 0, 0.582);} 
+	50% { box-shadow: 0 0 0 4px rgb(255, 196, 0), 0 0 0 6px rgba(255, 196, 0, 0.527);} 
 }
 .observation-marker-container:hover>.hover-detail{
 display: block;
@@ -103,6 +108,11 @@ background-color: white;
 border-radius: 5px;
 padding: 2rem;
 
+
+}
+
+.height-100 {
+  height: 100%;
 }
 
 

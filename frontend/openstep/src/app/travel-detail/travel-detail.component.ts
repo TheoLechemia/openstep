@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, inject } from '@angular/core';
+import { Component, OnInit, Input, ViewChild, ElementRef } from '@angular/core';
 import {  DatePipe } from '@angular/common';
 
 import { MapComponent } from '../map/map.component';
@@ -7,17 +7,9 @@ import { MatIcon } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import {MatButtonModule} from '@angular/material/button';
 import {MatDividerModule} from '@angular/material/divider';
-import {
-  MatDialog,
-  MatDialogActions,
-  MatDialogClose,
-  MatDialogContent,
-  MatDialogRef,
-  MatDialogTitle,
-} from '@angular/material/dialog';
-import { StepDetailComponent } from '../step-detail/step-detail.component';
-import * as L from "leaflet"
 import 'leaflet-polylinedecorator';
+import { Router } from '@angular/router';
+import { MapService } from '../map.service';
 
 
 @Component({
@@ -25,42 +17,24 @@ import 'leaflet-polylinedecorator';
   standalone: true,
   imports: [MapComponent, MatIcon, MatCardModule, MatButtonModule, MatDividerModule, DatePipe],
   templateUrl: './travel-detail.component.html',
-  styleUrl: './travel-detail.component.scss'
+  styleUrl: './travel-detail.component.scss',
+  providers: [MapService]
 })
 export class TravelDetailComponent implements OnInit {
-  constructor(private _api: ApiService) {}
-  readonly dialog = inject(MatDialog);
-
+  constructor(private _api: ApiService, private _router : Router, private _mapService: MapService) {}
+  @ViewChild('slider') slider: ElementRef;
   public travel: any = {}
   @Input()
   set id(idTravel: number) {
     this._api.getTravel(idTravel).subscribe(travel => {
       const steps = travel.steps;
       travel.steps.features.forEach((step: any, index) => {
-        step.properties.dayOfStep = this.calculateDayOfStep(step.properties.date);
         step.properties.isLastStep = index == travel.steps.features.length -1
-        this._api.getNominatimInfo(step.geometry.coordinates[1], step.geometry.coordinates[0]).subscribe(data => {
-          if("address" in data) {
-            step.properties.country = data.address.country;
-            step.properties.state = data.address.state;
-          }
-          
-        })
       });
+      this._mapService.displayTravelLine(travel.steps)
       this.travel = travel;
       
     });
-  }
-
-
-  calculateDayOfStep(stepDate) {
-    const travelStart = new Date(this.travel.start_date);
-    const stepDateD = new Date(stepDate);
-
-    let differenceInTime = stepDateD.getTime() - travelStart.getTime();
-    return Math.round(differenceInTime / (1000 * 3600 * 24));
-
-
   }
 
 
@@ -68,16 +42,24 @@ export class TravelDetailComponent implements OnInit {
     
   }
 
-  openDialog(step): void {
-    this.dialog.open(StepDetailComponent, {
-      width: "80%",
-      data: {
-        travel: this.travel,
-        step: step,
-      },
+  zoomOnLayer(idStep) {
+    for(let key in this._mapService.layers) {
+      const currentLayer: L.Marker = this._mapService.layers[key];
+      const regularIcon = this._mapService.getIcon(currentLayer.feature, false);
+      currentLayer.setIcon(regularIcon);
     }
+    const layer = this._mapService.layers[idStep];
+    const selectedIcon = this._mapService.getIcon(layer.feature, true)
+    layer.setIcon(selectedIcon);
+    
+    if(layer) {
+      this._mapService.map.setView(layer.getLatLng(), 12)
+    }
+    
+  }
 
-    );
+  goToDetail(idStep) {    
+    this._router.navigate(["step", idStep])
   }
 
   generatePopup(feature) {
@@ -100,23 +82,11 @@ export class TravelDetailComponent implements OnInit {
                 <button class="mdc-button mdc-button--unelevated mat-mdc-unelevated-button mat-unthemed mat-mdc-button-base" > See this step</button>
               </div>
             </div>
-    
     `
   }
 
-  pointToLayer(feature, latLng) {
-    console.log("LAAA", feature.properties.isLastStep );
-    
-    let icon = L.divIcon({
-      html:`<div class="observation-marker-container ${feature.properties.isLastStep ? "last-step": ""}">
-
-          </div>
-        </div>`,
-      className: 'observation-marker',
-      iconSize: 32,
-      iconAnchor: [18, 28],
-    } as any);
-    const marker = L.marker(latLng, {icon: icon});
+  pointToLayer(feature, latLng) {    
+    const marker = this._mapService.pointToLayer(feature, latLng);
     marker.bindPopup(this.generatePopup(feature));
     marker.on('mouseover', function (e) {
         this.openPopup();
@@ -124,12 +94,12 @@ export class TravelDetailComponent implements OnInit {
     return marker;
   }
 
-  right() {
 
-  }
-
-  left() {
-    
+  moove(pixel:number) {
+    this.slider.nativeElement.scrollBy({
+      left: pixel,
+      behavior: 'smooth',
+    });
   }
 
 }

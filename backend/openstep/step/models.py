@@ -1,5 +1,10 @@
+import requests
+
+from typing import Any, Iterable
 from django.contrib.gis.db import models
 from django.utils.translation import gettext_lazy as _
+
+from geopy.geocoders import Nominatim
 
 # Create your models here.
 
@@ -18,12 +23,31 @@ class Step(models.Model):
     name = models.CharField()
     date = models.DateField()
     location = models.PointField(srid=4326, verbose_name=_("Location"))
+    country = models.CharField(null=True, blank=True)
+    state = models.CharField(null=True, blank=True)
     description = models.CharField(blank=True, null=True)
     travel = models.ForeignKey(
         Travel, 
         on_delete=models.CASCADE, 
         related_name="steps",
     )
+
+    @property
+    def day_of_travel(self)->int:
+        """Return the day nunmber of travel of this step"""
+        delta = self.date - self.travel.start_date
+        return delta.days
+
+    def save(self, *args, **kwargs):
+        nominatim = Nominatim(user_agent="openstep")
+        response = nominatim.reverse((self.location.y, self.location.x))
+        if response:
+            if "address" in response.raw:
+                self.country = response.raw["address"].get("country", None)
+                self.state = response.raw["address"].get("state", None)
+
+        super().save(*args, *kwargs)
+
 
     class Meta:
         ordering = ["date"]
@@ -37,7 +61,7 @@ class Step(models.Model):
     
 
 class Media(models.Model):
-    legend = models.CharField()
+    legend = models.CharField(blank=True, null=True)
     media_file = models.FileField(upload_to="static", verbose_name=_("File"))
 
     step = models.ForeignKey(

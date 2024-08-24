@@ -22,17 +22,14 @@
 
 
 <div id="caroussel-container" class="cover caroussel-block mt-2">
-        <button (click)="right()" class="left"  mat-mini-fab>
+        <button (click)="moove(-400)" class="left"  mat-mini-fab>
             <mat-icon>chevron_left</mat-icon>
         </button>
 
     <div class="caroussel height-100"  #slider > 
     @for (step of travel?.steps?.features; track step.id) {
-        <mat-card class="step-card" >
-            <img (click)="openDialog(step)" class="travel-img" style="height: 80%;" #img mat-card-image src="{{step.properties.first_media.media_file}}" alt="">
-            <div class="gradian">
-
-            </div>
+        <mat-card class="step-card">
+            <img class="travel-img" (click)="goToDetail(step.id)" style="height: 80%;" #img mat-card-image src="{{step.properties.first_media?.media_file}}" alt="">
             <div class="float-info">
                 <div class="step-info-overlay">
                     <h4> {{step.properties.name}} </h4>
@@ -52,7 +49,7 @@
                     <mat-icon >calendar_month</mat-icon> <span class="text-muted"> {{step.properties.date  |date: 'dd MMM yyyy' }} </span> 
                 </span>
 
-                <button mat-icon-button class="icon-text" >
+                <button (click)="zoomOnLayer(step.id)" mat-mini-fab class="icon-text" >
                     <mat-icon >map</mat-icon>
                   </button>
                 <button style="display: none;"  mat-flat-button>  test</button>
@@ -60,10 +57,9 @@
                 
         </mat-card>
     }
-
     
     </div>
-        <button (click)="left()" class="right"  mat-mini-fab>
+        <button (click)="moove(400)" class="right"  mat-mini-fab>
             <mat-icon>chevron_right</mat-icon>
         </button>
 </div>

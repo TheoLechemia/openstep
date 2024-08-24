@@ -22,7 +22,7 @@ export class ApiService {
   }
 
   getStep(idStep:number): Observable<any> {
-    return this._http.get<any>(`http://127.0.0.1:8000/api/step/${idStep}`)
+    return this._http.get<any>(`http://127.0.0.1:8000/api/steps/${idStep}`)
   }
 
   getSteps(idTravel: number): Observable<any>  {
@@ -31,9 +31,5 @@ export class ApiService {
         return resp["results"]
       })
     )
-  }
-
-  getNominatimInfo(x: number, y: number): Observable<any>  {
-    return this._http.get<any>(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${x}&lon=${y}`)
   }
 }

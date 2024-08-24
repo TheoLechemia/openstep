@@ -1,0 +1,31 @@
+#map-container {
+    height: 20% ;
+}
+
+@media (min-width: 768px) {
+    #map-container {
+        height: 100% ;
+    }
+}
+
+
+
+#detail-container {
+    height: 80% ;
+    overflow-y: auto;
+}
+
+@media (min-width: 768px) {
+    #detail-container {
+        height: 100% ;
+    }
+}
+
+.description-padding {
+    padding: 0.5rem 1rem 0rem 1rem;
+}
+
+.flex {
+    display: flex;
+    flex-direction: row;
+}

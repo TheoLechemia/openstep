@@ -3,12 +3,14 @@ import { MapComponent } from '../map/map.component';
 import { RouterLink, RouterLinkActive, RouterModule, RouterOutlet } from '@angular/router';
 
 import { ApiService } from '../api.service';
+import { MapService } from '../map.service';
 @Component({
   selector: 'app-travels',
   standalone: true,
   imports: [MapComponent, RouterLink, RouterOutlet],
   templateUrl: './travels.component.html',
-  styleUrl: './travels.component.scss'
+  styleUrl: './travels.component.scss',
+  providers: [MapService]
 })
 export class TravelsComponent implements OnInit {
   public travels: Array<any> = [];
