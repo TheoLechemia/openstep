@@ -4,7 +4,12 @@ from rest_framework import routers, serializers, viewsets
 from rest_framework_gis import serializers as gis_serializers
 
 
-from step.models import Step, Travel, Media
+from step.models import Step, Travel, Media, Comments
+
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comments
+        fields = "__all__"
 
 class MediaSerializer(serializers.ModelSerializer):
     class Meta:
@@ -20,11 +25,12 @@ class StepSerializer(gis_serializers.GeoFeatureModelSerializer):
     medias = MediaSerializer(many=True)
     first_media = MediaSerializer()
     travel = TravelSerializerNoStep()
+    comments = CommentSerializer(many=True)
 
     class Meta:
         model = Step
         fields = (
-            'travel', 'id', 'name', 'location', 'description', 'date', 'medias', 'first_media', 'day_of_travel', "country", "state")
+            'travel', 'comments', 'id', 'name', 'location', 'description', 'date', 'medias', 'first_media', 'day_of_travel', "country", "state")
         geo_field = "location"
 
 
@@ -46,3 +52,21 @@ class StepViewSet(viewsets.ModelViewSet):
 class TravelViewSet(viewsets.ModelViewSet):
     queryset = Travel.objects.all().prefetch_related("steps")
     serializer_class = TravelSerializer
+
+from rest_framework.response import Response
+from rest_framework import status
+
+class CommentiewSet(viewsets.ModelViewSet):
+    permission_classes = []
+    queryset = Comments.objects.all()
+    serializer_class = CommentSerializer
+
+
+
+    def post(self, request, format=None):
+        serializer = self.serializer_class(data=request.data)
+
+        if serializer.is_valid():
+            return Response(serializer(request.data).data, status=status.HTTP_201_CREATED)
+        
+        return Response({'Bad Request': "Invalid Data..."}, status=status.HTTP_400_BAD_REQUEST)

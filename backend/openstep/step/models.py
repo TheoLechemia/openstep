@@ -1,8 +1,10 @@
-import requests
-
+from datetime import datetime
 from typing import Any, Iterable
 from django.contrib.gis.db import models
 from django.utils.translation import gettext_lazy as _
+from django.utils.timezone import now
+
+from django_resized import ResizedImageField
 
 from geopy.geocoders import Nominatim
 
@@ -13,7 +15,12 @@ class Travel(models.Model):
     description =  models.CharField()
     start_date = models.DateField()
     end_date = models.DateField(blank=True, null=True)
-    main_photo = models.FileField(upload_to="static", verbose_name=_("File"))
+    main_photo = ResizedImageField(
+        upload_to="static", 
+        verbose_name=_("File"),
+        size=[1000, 800],
+        force_format="PNG"
+    )
 
     def __str__(self) -> str:
         return self.name
@@ -62,10 +69,25 @@ class Step(models.Model):
 
 class Media(models.Model):
     legend = models.CharField(blank=True, null=True)
-    media_file = models.FileField(upload_to="static", verbose_name=_("File"))
+    media_file = ResizedImageField(
+        upload_to="static",
+        verbose_name=_("File"),
+        size=[1000, 800],
+        force_format="PNG"
+    )
 
     step = models.ForeignKey(
         Step, 
         on_delete=models.CASCADE, 
         related_name="medias",
+    )
+
+
+class Comments(models.Model):
+    message = models.TextField()
+    date = models.DateTimeField(auto_now=True, blank=True)
+    step = models.ForeignKey(
+        Step, 
+        on_delete=models.CASCADE, 
+        related_name="comments",
     )

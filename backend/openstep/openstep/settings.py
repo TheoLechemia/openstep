@@ -48,7 +48,8 @@ INSTALLED_APPS = [
     'tinymce',
     'rest_framework',
     'rest_framework_gis',
-    'django_filters'
+    'django_filters',
+    'corsheaders'
 ]
 
 MIDDLEWARE = [
@@ -59,7 +60,16 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+        'corsheaders.middleware.CorsMiddleware',
+
+
 ]
+
+
+CORS_ALLOWED_ORIGINS = [
+    'http://127.0.0.1:4200',
+]
+
 
 ROOT_URLCONF = 'openstep.urls'
 

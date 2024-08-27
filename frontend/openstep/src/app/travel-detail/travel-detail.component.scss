@@ -117,11 +117,3 @@
 .travel-img {
     cursor: pointer;
 }
-
-
-.step-info-overlay {
-    border-radius: var(--mdc-elevated-card-container-shape, var(--mat-app-corner-medium));
-    padding-top:0.5rem;
-    padding-left: 0.5rem;
-    background: linear-gradient(to top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.596));
-}

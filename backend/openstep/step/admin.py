@@ -38,6 +38,7 @@ class StepAdmin(GISModelAdmin):
     form = StepForm
     inlines = [MediaInline]
     list_display = ("name", "description", "media_preview",)
+    fields = ("travel", "name", "date", "location", "description")
 
     @admin.display(description="Media")
     def media_preview(self, obj):

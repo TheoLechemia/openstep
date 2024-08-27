@@ -1,6 +1,6 @@
 
   
-    <div class="row">
+    <div class="row g-0 page-container">
       <div class="col-12 col-md-9 order-md-2">
         <app-map></app-map>
       </div>
@@ -8,14 +8,17 @@
         @for (travel of travels; track travel.id) {
 
           <a [routerLink]="['travel', travel.id]" routerLinkActive="active">
-            <div class="travel-container mt-2" >
+            <div class="travel-container mt-2 p-2" >
               <div class="img-container" style="background-image: url({{travel.main_photo}});">
                 
               </div>
     
-              <div class="overlay">
-                <h2> {{travel.name}} </h2>
-                <p> {{travel.description}} </p>
+              <div class="overlay p-2">
+                <div class="info-overlay">
+                  <h2> {{travel.name}} </h2>
+                  <p> {{travel.description}} </p>
+
+                </div>
               </div>
   
             </div>

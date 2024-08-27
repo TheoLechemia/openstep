@@ -5,6 +5,8 @@
         </div>
 
         @if(step) {
+
+
             <div class="col-12 col-md-7 order-md-1" id="detail-container">
                 <div class="description-padding">
                     <a [routerLink]="['/travel', step.properties.travel.id]">
@@ -31,8 +33,11 @@
                 <carousel>
                     @for(media of step.properties.medias; track step.properties.medias.id) {
                         
-                        <slide>
-                            <img src="{{media.media_file}}" alt="second slide" style="display: block; width: 100%;">
+                        <slide style="cursor: pointer;">
+                            <a href="{{media.media_file}}">
+                                <img src="{{media.media_file}}" alt="second slide" style="display: block; width: 100%;">
+
+                            </a>
                         </slide>
                     }
                     
@@ -42,21 +47,29 @@
 
                     <mat-divider class="mt-4 mb-4 ps-1"></mat-divider>
                     <mat-list>
-                        @for(comment of comments; track comment) {
+                        @for(comment of step.properties.comments; track comment) {
                             <mat-list-item>
                                 <mat-icon matListItemIcon>mood</mat-icon>
                                 <div matListItemTitle>{{comment.message}}</div>
-                                <div matListItemLine> <small> {{comment.date}}</small> </div>
+                                <div matListItemLine> <small> {{comment.date | date:'short'}}</small> </div>
                               </mat-list-item>
                         }
 
                     </mat-list>
 
-                    <mat-form-field appearance="outline">
-                        <mat-label>Comment</mat-label>
-                        <input matInput placeholder="Comment">
-                        <mat-icon matSuffix>comment</mat-icon>
-                      </mat-form-field>
+                    <div class="row">
+
+                        <mat-form-field class="col-10" appearance="outline">
+                            <mat-label>Comment</mat-label>
+                            <textarea [(ngModel)]="commentMessage" matInput placeholder="Comment"> </textarea>
+                            <mat-icon matSuffix>comment</mat-icon>
+                        </mat-form-field>
+    
+                        <button (click)="addComment()" class="ms-2 col-2 mt-3" mat-mini-fab aria-label="Example icon button with a home icon">
+                            <mat-icon>send</mat-icon>
+                          </button>                
+                    </div>
+
                 </div>
                 
             </div>

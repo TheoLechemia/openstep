@@ -67,7 +67,6 @@ export class TravelDetailComponent implements OnInit {
     let firstMedia = null;
     let stepDay =  new Date(feature.properties.date);
     let now = new Date();
-    console.log(stepDay);
     let differenceInTime = now.getTime() - stepDay.getTime();
     let diffenreceInDay = Math.round(differenceInTime / (1000 * 3600 * 24));
     if(hasMedias) {
@@ -76,10 +75,15 @@ export class TravelDetailComponent implements OnInit {
     return `
           <div class="img-container" style="background-image: url(${firstMedia});">
             <div class="overlay">
-              <h4> ${feature.properties.name} </h4>
-              <p> ${feature.properties.date} - ${diffenreceInDay} days ago </p>
+              <div class="info-overlay"> 
+                <h4> ${feature.properties.name} </h4>
+                <p> ${feature.properties.date} - ${diffenreceInDay} days ago </p>
+
+              </div>
               <div class="button-see-step">
-                <button class="mdc-button mdc-button--unelevated mat-mdc-unelevated-button mat-unthemed mat-mdc-button-base" > See this step</button>
+              <a href="./step/${feature.id}" > 
+              <button class="mdc-button mdc-button--unelevated mat-mdc-unelevated-button mat-unthemed mat-mdc-button-base" > See this step</button>
+              </a>
               </div>
             </div>
     `

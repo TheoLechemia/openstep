@@ -123,8 +123,17 @@ padding: 2rem;
   background-size: cover;
   background-position: center center;
   border-radius: 25px;
+  border-radius: 25px;
   background-color: rgba(0, 0, 0, 0.5);
+  padding: 1rem;
 
+}
+
+.info-overlay {
+  border-radius: var(--mdc-elevated-card-container-shape, var(--mat-app-corner-medium));
+  padding-top:0.5rem;
+  padding-left: 0.5rem;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.596));
 }
 
 .overlay {
@@ -134,13 +143,14 @@ padding: 2rem;
   overflow: hidden;
   top: 0;
   left: 0;
-  padding: 1rem;
-  // background-color: rgba(0, 0, 0, 0.5);
-  background: linear-gradient(to top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.548));
-  
   color: white;
   border-radius: 25px;
 }
+
+a {
+  text-decoration-color: var(--mdc-filled-button-container-color)!important;
+}
+
 
 .leaflet-popup-content {
   margin: 0!important;

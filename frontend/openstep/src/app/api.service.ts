@@ -1,16 +1,17 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
+import { ConfigService } from './config.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ApiService {
 
-  constructor(private _http: HttpClient) { }
+  constructor(private _http: HttpClient, public configService: ConfigService) { }
 
-  getTravels(): Observable<any> {
-    return this._http.get<any>("http://127.0.0.1:8000/api/travels").pipe(
+  getTravels(): Observable<any> {    
+    return this._http.get<any>(`${this.configService.config.API_ENDPOINT}/travels`).pipe(
       map(resp => {
         return resp["results"]
       })
@@ -18,18 +19,17 @@ export class ApiService {
   }
 
   getTravel(idTravel:number): Observable<any> {
-    return this._http.get<any>(`http://127.0.0.1:8000/api/travels/${idTravel}`)
+    return this._http.get<any>(`${this.configService.config.API_ENDPOINT}/travels/${idTravel}`)
   }
 
   getStep(idStep:number): Observable<any> {
-    return this._http.get<any>(`http://127.0.0.1:8000/api/steps/${idStep}`)
+    return this._http.get<any>(`${this.configService.config.API_ENDPOINT}/steps/${idStep}`)
   }
 
-  getSteps(idTravel: number): Observable<any>  {
-    return this._http.get<any>("http://127.0.0.1:8000/api/steps/", {params: {"travel": idTravel}}).pipe(
-      map(resp => {
-        return resp["results"]
-      })
-    )
+  postComment(data: any): Observable<any> {
+    console.log("donc data", data);
+    
+    return this._http.post<any>(
+      `${this.configService.config.API_ENDPOINT}/comments/`, data)
   }
 }

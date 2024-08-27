@@ -17,8 +17,6 @@ export class MapService {
 
 
   getIcon(feature, selected:boolean= false) {
-    console.log("oHHHH", selected);
-    
     return L.divIcon({
       html:`<div class="observation-marker-container ${selected ? "selected-marker": ""} ${feature.properties.isLastStep ? "last-step": ""}">
           </div>
