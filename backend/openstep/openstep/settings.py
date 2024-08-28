@@ -30,7 +30,7 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
-MEDIA_ROOT = BASE_DIR / "static"
+MEDIA_ROOT = BASE_DIR / "assets"
 # Application definition
 
 INSTALLED_APPS = [

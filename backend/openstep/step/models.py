@@ -16,7 +16,6 @@ class Travel(models.Model):
     start_date = models.DateField()
     end_date = models.DateField(blank=True, null=True)
     main_photo = ResizedImageField(
-        upload_to="static", 
         verbose_name=_("File"),
         size=[1500, 1200],
         quality=85,
@@ -71,7 +70,7 @@ class Step(models.Model):
 class Media(models.Model):
     legend = models.CharField(blank=True, null=True)
     media_file = ResizedImageField(
-        upload_to="static",
+        # upload_to="static",
         verbose_name=_("File"),
         size=[1500, 1200],
         quality=85,
