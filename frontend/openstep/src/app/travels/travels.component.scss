@@ -1,3 +1,26 @@
+#map-container {
+    height: 35% ;
+}
+
+@media (min-width: 768px) {
+    #map-container {
+        height: 100% ;
+    }
+}
+
+#list-container {
+    height: 65% ;
+    overflow-y: auto;
+}
+
+@media (min-width: 768px) {
+    #list-container {
+        height: 100% ;
+    }
+}
+
+
+
 
 
 .travel-container {
@@ -29,4 +52,5 @@
     position: absolute;
     bottom: 0;
     left: 50%;
-    transform: translate(-50%, -50%);}
+    transform: translate(-50%, -50%);
+}

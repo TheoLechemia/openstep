@@ -152,12 +152,12 @@ a {
 }
 
 
-.leaflet-popup-content {
+.leaflet-popup-content:has(> .img-container) {
   margin: 0!important;
   width: 300px!important ;
 }
 
-.leaflet-popup-content-wrapper, .leaflet-popup-tip {
+.leaflet-popup-content-wrapper, .leaflet-popup-tip{
   background-color: transparent!important;
 }
 

@@ -18,8 +18,9 @@ class Travel(models.Model):
     main_photo = ResizedImageField(
         upload_to="static", 
         verbose_name=_("File"),
-        size=[1000, 800],
-        force_format="PNG"
+        size=[1500, 1200],
+        quality=85,
+        force_format="JPEG"
     )
 
     def __str__(self) -> str:
@@ -72,8 +73,9 @@ class Media(models.Model):
     media_file = ResizedImageField(
         upload_to="static",
         verbose_name=_("File"),
-        size=[1000, 800],
-        force_format="PNG"
+        size=[1500, 1200],
+        quality=85,
+        force_format="JPEG"
     )
 
     step = models.ForeignKey(

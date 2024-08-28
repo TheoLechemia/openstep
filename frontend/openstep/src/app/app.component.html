@@ -1,7 +1,9 @@
-
-  <mat-toolbar>
-    <span id="app-name" routerLink="" >BeagleSteps</span>
+ <mat-toolbar>
+    <span routerLink=""> {{appName}} </span>
     <span class="example-spacer"></span>
+    <button (click)="openDialog()" mat-icon-button class="example-icon favorite-icon icon-text" aria-label="Example icon-button with heart icon">
+      <mat-icon>info</mat-icon>
+    </button>
   </mat-toolbar>
 
   

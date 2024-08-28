@@ -47,6 +47,10 @@ class StepViewSet(viewsets.ModelViewSet):
     serializer_class = StepSerializer
     queryset = Step.objects.all().prefetch_related("medias").order_by('date')
     filterset_fields = ['name', 'travel']
+    page_size = 300
+    max_page_size = 500
+
+
 
     
 class TravelViewSet(viewsets.ModelViewSet):
@@ -65,6 +69,8 @@ class CommentiewSet(viewsets.ModelViewSet):
 
     def post(self, request, format=None):
         serializer = self.serializer_class(data=request.data)
+
+        serializer.error_messages
 
         if serializer.is_valid():
             return Response(serializer(request.data).data, status=status.HTTP_201_CREATED)
