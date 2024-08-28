@@ -13,7 +13,6 @@ import os
 
 from pathlib import Path
 
-from .config import *
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -31,6 +30,7 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
+MEDIA_ROOT = BASE_DIR / "static"
 # Application definition
 
 INSTALLED_APPS = [
@@ -156,3 +156,5 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
 
 }
+
+from .config import *

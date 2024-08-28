@@ -8,3 +8,13 @@ DATABASES = {
         "PORT": "5432",
     }
 }
+
+
+
+ALLOWED_HOSTS = ["127.0.0.1"]
+FORCE_SCRIPT_NAME = '/backend'
+CSRF_TRUSTED_ORIGINS = ["http://lalal"]
+MEDIA_URL = "http://lalal" 
+
+STATIC_ROOT = '/home/debian/openstep/backend/openstep/assets'
+STATIC_URL = '/static/'
