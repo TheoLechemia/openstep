@@ -1,13 +1,13 @@
 
     <div class="row height-100 g-0">
-        <div class="col-12 col-md-5 order-md-2" id="map-container">
+        <div class="col-12 col-md-7 order-md-2" id="map-container">
             <app-map [geojson]="step" ></app-map>
         </div>
 
         @if(step) {
 
 
-            <div class="col-12 col-md-7 order-md-1" id="detail-container">
+            <div class="col-12 col-md-5 order-md-1" id="detail-container">
                 <div class="description-padding">
                     <a [routerLink]="['/travel', step.properties.travel.id]">
                         <small class="me-2 primary-color">  {{ step.properties.travel.name}} </small>
@@ -48,11 +48,16 @@
                     <mat-divider class="mt-4 mb-4 ps-1"></mat-divider>
                     <mat-list>
                         @for(comment of step.properties.comments; track comment) {
-                            <mat-list-item>
-                                <mat-icon matListItemIcon>mood</mat-icon>
-                                <div matListItemTitle>{{comment.message}}</div>
-                                <div matListItemLine> <small> {{comment.date | date:'short'}}</small> </div>
-                              </mat-list-item>
+
+                            <p>
+                                    <mat-icon matListItemIcon>mood</mat-icon>
+
+                                {{comment.message}} <br>
+                                    <small class="text-muted">
+                                        {{comment.date | date:'short'}}
+                                    </small>
+                            </p>
+
                         }
 
                     </mat-list>

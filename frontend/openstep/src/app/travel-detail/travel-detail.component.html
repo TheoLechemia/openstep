@@ -31,7 +31,7 @@
         <mat-card class="step-card height-100">
             <img class="step-img" (click)="goToDetail(step.id)" #img mat-card-image src="{{step.properties.first_media?.media_file}}" alt="">
             <div class="float-info">
-                <div class="info-overlay">
+                <div (click)="goToDetail(step.id)"  class="info-overlay">
                     <h4> {{step.properties.name}} </h4>
                     <span> {{step.properties.country}}  </span>
 
