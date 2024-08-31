@@ -36,7 +36,7 @@ export class TravelsComponent implements OnInit {
 
   pointToLayer(feature, latLng) {    
     const marker = this._mapService.pointToLayer(feature, latLng);
-    marker.bindPopup( `<h3> <a href="./travel/${feature.properties.travel.id}"> ${feature.properties.travel.name} </a> </h3>`);
+    marker.bindPopup( `<h3> <a href="./#/travel/${feature.properties.travel.id}"> ${feature.properties.travel.name} </a> </h3>`);
     marker.on('click', function (e) {
         this.openPopup();
     });

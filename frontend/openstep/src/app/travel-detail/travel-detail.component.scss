@@ -68,7 +68,7 @@
 }
 
 .step-card {
-    height: 98%;
+    width: 400px;
     opacity: 92%;
 }
 
@@ -106,9 +106,6 @@ mar-card-actions {
     height: 100%;
 }
 
-.step-img {
-    height: 80%;
-}
 
 .float-info {
     width: 100%;
@@ -117,6 +114,17 @@ mar-card-actions {
     cursor: pointer;
 }
 
-.travel-img {
+.step-img {
     cursor: pointer;
+    height: fit-content; //so that it takes up full space
+    max-height: 70% !important; // this prevents the image from being extremely big
+    object-fit: cover; 
+    object-position: center
+}
+
+@media (min-width: 768px) {
+    .step-img {
+        max-height: 80% !important; // this prevents the image from being extremely big
+    }
+
 }

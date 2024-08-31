@@ -28,8 +28,8 @@
 
     <div class="caroussel height-100"  #slider > 
     @for (step of travel?.steps?.features; track step.id) {
-        <mat-card class="step-card">
-            <img class="travel-img" (click)="goToDetail(step.id)" style="height: 80%;" #img mat-card-image src="{{step.properties.first_media?.media_file}}" alt="">
+        <mat-card class="step-card height-100">
+            <img class="step-img" (click)="goToDetail(step.id)" #img mat-card-image src="{{step.properties.first_media?.media_file}}" alt="">
             <div class="float-info">
                 <div class="info-overlay">
                     <h4> {{step.properties.name}} </h4>
