@@ -81,6 +81,7 @@
     overflow-x: auto;
     position: relative;
     height: 95%;
+    padding: 1rem;
 }
 
 .caroussel mat-card {
@@ -88,6 +89,13 @@
 }
 
 
+mar-card-actions {
+   font-size: 0.1rem; 
+}
+
+.size {
+    font-size: 1rem;
+}
 
 #travel-card {
     height: 30vh;

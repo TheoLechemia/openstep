@@ -39,18 +39,18 @@
             </div>
 
             <mat-card-actions>
-                <span id="nb-comments" class="me-4 icon-text">
-                    <mat-icon >chat</mat-icon> <span class="text-muted"> {{step.properties.comments.length}} </span> 
+                <span id="nb-comments" class="me-4 size">
+                    <mat-icon [inline]="true">chat</mat-icon> <span class="text-muted"> {{step.properties.comments.length}} </span> 
                 </span>
-                <span id="nb-photos" class="me-4">
-                    <mat-icon >photo_camera</mat-icon> <span class="text-muted"> {{step.properties.medias.length}} </span> 
+                <span id="nb-photos" class="me-4 size">
+                    <mat-icon [inline]="true" >photo_camera</mat-icon> <span class="text-muted"> {{step.properties.medias.length}} </span> 
                 </span>
-                <span class="me-4">
-                    <mat-icon >calendar_month</mat-icon> <span class="text-muted"> {{step.properties.date  |date: 'dd MMM yyyy' }} </span> 
+                <span class="me-4 size">
+                    <mat-icon [inline]="true" >calendar_month</mat-icon> <span class="text-muted"> {{step.properties.date  |date: 'dd MMM yyyy' }} </span> 
                 </span>
 
-                <button (click)="zoomOnLayer(step.id)" mat-mini-fab class="icon-text" >
-                    <mat-icon >map</mat-icon>
+                <button (click)="zoomOnLayer(step.id)" mat-mini-fab class="" >
+                    <mat-icon  >map</mat-icon>
                   </button>
                 <button style="display: none;"  mat-flat-button>  test</button>
             </mat-card-actions>
