@@ -1,32 +1,13 @@
 
 #map-container {
-    height:60vh;
+    height:60%;
 }
-
-@media (min-width: 768px) {
-    #map-container {
-        height: calc(
-            60vh - var(--mat-toolbar-standard-height)
-          )
-    }
-}
-
 
 #caroussel-container {
-    height: calc(
-        40vh - var(--mat-toolbar-standard-height)
-      ); 
+    height: 38%
 }
 
 
-@media (min-width: 768px) {
-    #steps-container {
-        height: calc(
-            100vh - var(--mat-toolbar-standard-height)
-          );
-        overflow-y: scroll;
-    }
-}
 
 #travel-container {
     display: none;
@@ -37,6 +18,20 @@
 }
 @media (min-width: 768px) {
     #travel-container {
+        display: block;
+    }
+}
+
+#nb-photos, #nb-comments {
+    display: none;
+}
+
+// #nb-comments {
+//     display: none;
+// }
+
+@media (min-width: 768px) {
+    #nb-photos, #nb-comments {
         display: block;
     }
 }

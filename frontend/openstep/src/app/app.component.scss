@@ -4,7 +4,7 @@ mat-toolbar {
 
 #my-container {
     height: calc(
-        100vh - var(--mat-toolbar-standard-height)
+        100dvh - var(--mat-toolbar-standard-height)
       )
 }
 

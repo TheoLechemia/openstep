@@ -81,7 +81,7 @@ export class TravelDetailComponent implements OnInit {
 
               </div>
               <div class="button-see-step">
-              <a href="./step/${feature.id}" > 
+              <a href="./#/step/${feature.id}" > 
               <button class="mdc-button mdc-button--unelevated mat-mdc-unelevated-button mat-unthemed mat-mdc-button-base" > See this step</button>
               </a>
               </div>
