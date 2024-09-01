@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChild, ElementRef } from '@angular/core';
+import { Component, Input, ViewChild, ElementRef } from '@angular/core';
 import {  DatePipe } from '@angular/common';
 
 import { MapComponent } from '../map/map.component';
@@ -20,7 +20,7 @@ import { MapService } from '../map.service';
   styleUrl: './travel-detail.component.scss',
   providers: [MapService]
 })
-export class TravelDetailComponent implements OnInit {
+export class TravelDetailComponent {
   constructor(private _api: ApiService, private _router : Router, private _mapService: MapService) {}
   @ViewChild('slider') slider: ElementRef;
   public travel: any = {}
@@ -34,13 +34,16 @@ export class TravelDetailComponent implements OnInit {
       this._mapService.displayTravelLine(travel.steps)
       this.travel = travel;
       
+      setTimeout(() => {
+        this.slider.nativeElement.scrollBy({
+          left : this.slider.nativeElement.scrollWidth,
+          behavior: 'smooth',
+          
+        })
+      }, 500);
     });
   }
 
-
-  ngOnInit(): void {
-    
-  }
 
   zoomOnLayer(idStep) {
     for(let key in this._mapService.layers) {

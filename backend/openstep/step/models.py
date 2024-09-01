@@ -92,3 +92,5 @@ class Comments(models.Model):
         on_delete=models.CASCADE, 
         related_name="comments",
     )
+    def __str__(self) -> str:
+        return self.message

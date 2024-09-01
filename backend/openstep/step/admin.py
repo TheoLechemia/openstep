@@ -10,7 +10,7 @@ from tinymce.widgets import TinyMCE
 
 
 
-from step.models import Step, Travel, Media
+from step.models import Step, Travel, Media, Comments
 
 
 class StepForm(forms.ModelForm):
@@ -52,7 +52,11 @@ class StepAdmin(GISModelAdmin):
 class TravelAdmin(admin.ModelAdmin):
     pass
 
+class CommentAdmin(admin.ModelAdmin):
+    pass
+
 
 admin.site.register(Step, StepAdmin)
 admin.site.register(Travel, TravelAdmin)
+admin.site.register(Comments, TravelAdmin)
 
