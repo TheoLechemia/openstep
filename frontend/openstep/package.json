@@ -25,6 +25,7 @@
     "leaflet-polylinedecorator": "^1.6.0",
     "ngx-bootstrap": "^18.0.2",
     "rxjs": "~7.8.0",
+    "swiper": "^11.1.15",
     "tslib": "^2.3.0",
     "zone.js": "~0.14.10"
   },

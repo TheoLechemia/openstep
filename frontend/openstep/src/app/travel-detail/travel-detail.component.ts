@@ -1,4 +1,4 @@
-import { Component, Input, ViewChild, ElementRef } from '@angular/core';
+import { Component, Input, ViewChild, ElementRef, CUSTOM_ELEMENTS_SCHEMA, AfterViewInit } from '@angular/core';
 import {  DatePipe } from '@angular/common';
 
 import { MapComponent } from '../map/map.component';
@@ -13,14 +13,17 @@ import { MapService } from '../map.service';
 
 
 @Component({
-  selector: 'app-travel-detail',
+  selector: 'app-travel-detaisl',
   standalone: true,
   imports: [MapComponent, MatIcon, MatCardModule, MatButtonModule, MatDividerModule, DatePipe],
   templateUrl: './travel-detail.component.html',
   styleUrl: './travel-detail.component.scss',
-  providers: [MapService]
+  providers: [MapService],
+  schemas: [
+    CUSTOM_ELEMENTS_SCHEMA
+  ],
 })
-export class TravelDetailComponent {
+export class TravelDetailComponent implements AfterViewInit {
   constructor(private _api: ApiService, private _router : Router, private _mapService: MapService) {}
   @ViewChild('slider') slider: ElementRef;
   public travel: any = {}
@@ -34,14 +37,46 @@ export class TravelDetailComponent {
       this._mapService.displayTravelLine(travel.steps)
       this.travel = travel;
       
-      setTimeout(() => {
-        this.slider.nativeElement.scrollBy({
-          left : this.slider.nativeElement.scrollWidth,
-          behavior: 'smooth',
+      // setTimeout(() => {
+      //   this.slider.nativeElement.scrollBy({
+      //     left : this.slider.nativeElement.scrollWidth,
+      //     behavior: 'smooth',
           
-        })
-      }, 500);
+      //   })
+      // }, 500);
     });
+  }
+
+  ngAfterViewInit(): void {
+    const swiperEl = document.querySelector('swiper-container');
+    const swiperParams = {
+      gridRow: 1,
+      // pagination : {
+      //   clickable : true
+      // },
+      // spaceBetween: 5,
+      mousewheel: true,
+      slidesPerView: 1.5,
+      initialSlide: 9,
+      breakpoints: {
+        640: {
+          slidesPerView: 2,
+        },
+        1024: {
+          slidesPerView: 5,
+        },
+      },
+      on: {
+        init() {
+          // ...
+        },
+      },
+    };
+
+    Object.assign(swiperEl, swiperParams);
+
+    // and now initialize it
+    swiperEl.initialize();
   }
 
 
