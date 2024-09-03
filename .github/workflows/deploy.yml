@@ -20,7 +20,7 @@ jobs:
 
     - name: Commit report
       run: |
-        git config --global TheoLechemia
+        git config --global 'TheoLechemia'
           git config --global user.email 'TheoLechemia@users.noreply.github.com'
           git commit -am "Automated report"
           git push
