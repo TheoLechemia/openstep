@@ -18,5 +18,11 @@ jobs:
       with:
         node-version: 18
     - name: Create local changes
-      run: touch test ini
+      run: touch test.ini
+
+    - name: Commit & Push changes
+      uses: actions-js/push@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+
 
