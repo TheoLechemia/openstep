@@ -22,7 +22,7 @@ jobs:
       run: |
         git config --global user.name 'TheoLechemia'
           git config --global user.email 'TheoLechemia@users.noreply.github.com'
-          github add -A
+          git add -A
           git commit -m "Automated report"
           git push
 
