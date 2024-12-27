@@ -40,9 +40,9 @@ export class TravelDetailComponent implements AfterViewInit {
       const swiperEl = document.querySelector('swiper-container');
       const swiperParams = {
         gridRow: 1,
-        pagination : {
-          clickable : true
-        },
+        // pagination : {
+        //   clickable : true
+        // },
         // spaceBetween: 5,
         mousewheel: true,
         slidesPerView: 1.5,
