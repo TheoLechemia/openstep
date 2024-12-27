@@ -36,47 +36,41 @@ export class TravelDetailComponent implements AfterViewInit {
       });
       this._mapService.displayTravelLine(travel.steps)
       this.travel = travel;
-      
-      // setTimeout(() => {
-      //   this.slider.nativeElement.scrollBy({
-      //     left : this.slider.nativeElement.scrollWidth,
-      //     behavior: 'smooth',
-          
-      //   })
-      // }, 500);
+
+      const swiperEl = document.querySelector('swiper-container');
+      const swiperParams = {
+        gridRow: 1,
+        pagination : {
+          clickable : true
+        },
+        // spaceBetween: 5,
+        mousewheel: true,
+        slidesPerView: 1.5,
+        initialSlide: this.travel.steps.features.length,
+        breakpoints: {
+          640: {
+            slidesPerView: 2,
+          },
+          1024: {
+            slidesPerView: 5,
+          },
+        },
+        on: {
+          init() {
+            // ...
+          },
+        },
+      };
+  
+      Object.assign(swiperEl, swiperParams);
+  
+      // and now initialize it
+      swiperEl.initialize();
     });
   }
 
   ngAfterViewInit(): void {
-    const swiperEl = document.querySelector('swiper-container');
-    const swiperParams = {
-      gridRow: 1,
-      // pagination : {
-      //   clickable : true
-      // },
-      // spaceBetween: 5,
-      mousewheel: true,
-      slidesPerView: 1.5,
-      initialSlide: 9,
-      breakpoints: {
-        640: {
-          slidesPerView: 2,
-        },
-        1024: {
-          slidesPerView: 5,
-        },
-      },
-      on: {
-        init() {
-          // ...
-        },
-      },
-    };
-
-    Object.assign(swiperEl, swiperParams);
-
-    // and now initialize it
-    swiperEl.initialize();
+   
   }
 
 
