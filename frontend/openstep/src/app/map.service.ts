@@ -5,14 +5,31 @@ import * as L from "leaflet"
 export class MapService {
   map: L.Map;
   layers: any = {};
-  constructor() { }
+  constructor() {     
+  }
 
-  pointToLayer(feature, latLng) {    
+  pointToLayer(feature, latLng) {
     const icon = this.getIcon(feature, false);
     const marker = L.marker(latLng, {icon: icon});
     marker.getLatLng
-    this.layers[feature.id] = marker;
+    this.layers[feature.id] = marker;    
     return marker;
+  }
+
+  zoomOnLayer(idStep, zoomLevel=12) {
+    for(let key in this.layers) {
+      const currentLayer: L.Marker = this.layers[key];
+      const regularIcon = this.getIcon(currentLayer.feature, false);
+      currentLayer.setIcon(regularIcon);
+    }
+    const layer = this.layers[idStep];
+    const selectedIcon = this.getIcon(layer.feature, true)
+    layer.setIcon(selectedIcon);
+    
+    if(layer) {
+      this.map.setView(layer.getLatLng(), zoomLevel)
+    }
+    
   }
 
 
@@ -27,14 +44,21 @@ export class MapService {
     } as any);
   }
 
+  setSelectedLayer() {
+
+  }
+
   displayTravelLine(geojson) {
     const arrayCoords = [];
     geojson.features.forEach(feature => { 
       arrayCoords.push([feature.geometry.coordinates[1],feature.geometry.coordinates[0]])
     });
+    
     const polyline = L.polyline(arrayCoords, {
       className: "polyline-primary"
-    }).addTo(this.map);        
+    })
+    
+    polyline.addTo(this.map); 
     this.map.addLayer(polyline);
       var markerPatterns = L.polylineDecorator(polyline, {
         patterns: [
