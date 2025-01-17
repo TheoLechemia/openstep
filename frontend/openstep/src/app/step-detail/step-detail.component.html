@@ -1,10 +1,96 @@
-
+@if(steps) {
     <div class="row height-100 g-0">
         <div class="col-12 col-md-7 order-md-2" id="map-container">
-            <app-map [geojson]="step" ></app-map>
+            <app-map [geojson]="steps"></app-map>
         </div>
+        <div class="col-12 col-md-5 order-md-1 height-100" id="detail-container">
+            <div class="description-padding">
+                <a [routerLink]="['/travel', travelService.travel?.id]"> 
+                     <small class="me-2 primary-color">  {{travelService.travel?.name}} </small>
+                </a>
 
-        @if(step) {
+            </div>
+            <swiper-container 
+                #swiperRef
+                init="false"
+                id="caroussel-container" 
+                class="mySwiper" 
+            >
+                @for (step of steps; track step.id; let i = $index) {
+                <div>
+
+                </div>
+                    <swiper-slide>
+                        <div class="description-padding">
+                            <h3 > {{step.properties.name}}  </h3>
+
+                            <div class="icon-text mb-2">
+                                <mat-icon class="me-1">location_on</mat-icon>
+                                <span> {{step.properties.country}} - {{step.properties.state}} </span>
+                            </div>
+                            <span class="icon-text mb-4">
+                                <mat-icon class="me-1">caflendar_month</mat-icon>
+                                <span> Day {{step.properties.day_of_travel}} - {{step.properties.date  |date: 'dd MMM yyyy' }} </span>
+                            </span>
+                            <p class="mt-2" [innerHTML]="step.properties.description" >
+                            <p style="display: none;">medias</p>
+                        </div>
+                        <carousel>
+                            @for(media of step.properties.medias; track media.id) {
+                                
+                                <slide style="cursor: pointer;">
+                                    <a href="{{media.media_file}}">
+                                        <img src="{{media.media_file}}" alt="second slide" style="display: block; width: 100%;">
+        
+                                    </a>
+                                </slide>
+                            }
+                            
+                        </carousel>
+                        <div class="description-padding" >
+
+                            <mat-divider class="mt-4 mb-4 ps-1"></mat-divider>
+
+                            <mat-list>
+                                @for(comment of step.properties.comments; track comment) {
+        
+                                    <p>
+                                            <mat-icon matListItemIcon>mood</mat-icon>
+        
+                                        {{comment.message}} <br>
+                                            <small class="text-muted">
+                                                {{comment.date | date:'short'}}
+                                            </small>
+                                    </p>
+        
+                                }
+        
+                            </mat-list>
+        
+                            <div class="row">
+        
+                                <mat-form-field class="col-10" appearance="outline">
+                                    <mat-label>Comment</mat-label>
+                                    <textarea [(ngModel)]="commentMessage" matInput placeholder="Comment"> </textarea>
+                                    <mat-icon matSuffix>comment</mat-icon>
+                                </mat-form-field>
+            
+                                <button (click)="addComment()" class="ms-2 col-2 mt-3" mat-mini-fab aria-label="Example icon button with a home icon">
+                                    <mat-icon>send</mat-icon>
+                                  </button>                
+                            </div>
+        
+                        </div>
+                        <br>
+
+                    </swiper-slide>
+                
+                }
+            </swiper-container>
+        </div>
+        
+
+        <!-- @if(step) {
 
 
             <div class="col-12 col-md-5 order-md-1" id="detail-container">
@@ -78,6 +164,12 @@
                 </div>
                 
             </div>
-        }
+        } -->
+
+
+
+
     </div>
+
+}
 

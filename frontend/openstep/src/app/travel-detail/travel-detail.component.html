@@ -94,7 +94,7 @@
                         <mat-icon [inline]="true" >calendar_month</mat-icon> <span class="text-muted"> {{step.properties.date  |date: 'dd MMM yyyy' }} </span> 
                     </span>
 
-                    <button (click)="zoomOnLayer(step.id)" mat-mini-fab class="" >
+                    <button (click)="mapService.zoomOnLayer(step.id)" mat-mini-fab class="" >
                         <mat-icon  >map</mat-icon>
                     </button>
                     <button style="display: none;"  mat-flat-button>  test</button>
@@ -106,3 +106,7 @@
 
 
 </swiper-container>
+
+
+<div>
+

@@ -1,4 +1,4 @@
-import { Component, Input, inject, TemplateRef } from '@angular/core';
+import { Component, Input, inject, CUSTOM_ELEMENTS_SCHEMA, AfterViewInit, ContentChild, ElementRef, ViewChildren, QueryList, ViewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 
 import { MatIcon } from '@angular/material/icon';
@@ -18,6 +18,10 @@ import {MatFormFieldModule, MatSuffix} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
 import {MatListModule} from '@angular/material/list';
 import { FormsModule } from '@angular/forms';
+import { TravelService } from '../travel.service';
+import { filter } from 'rxjs';
+import { SwiperContainer } from 'swiper/element';
+import { Swiper } from 'swiper/types';
 
 
 @Component({
@@ -26,36 +30,91 @@ import { FormsModule } from '@angular/forms';
   imports: [RouterLink, DatePipe, FormsModule, MatSuffix, MatInputModule,MatListModule, MatFormFieldModule, MapComponent, MatDivider, CarouselModule, MatButtonModule, DatePipe,  MatIcon],
   templateUrl: './step-detail.component.html',
   styleUrl: './step-detail.component.scss',
-  providers: [MapService]
+  providers: [MapService],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
+
 })
-export class StepDetailComponent  {
-  constructor(private _api: ApiService) {}
+export class StepDetailComponent implements AfterViewInit  {
+  constructor(private _api: ApiService,private _mapService: MapService,  public travelService: TravelService) {}
   public step:any;
+  public steps = [];
+  public idStep_: number;
   readonly dialog = inject(MatDialog);
 
 
-  comments = [
-    {"message" : "ah oausi de ouf", "date": "01/01/2022"},
-    {"message" : "MAIS NAN", "date": "01/01/2022"},
-    {"message" : "SI SI", "date": "01/01/2022"},
-  ]
   public commentMessage: string;
   @Input()
-  set id(idStep: number) {
-    this._api.getStep(idStep).subscribe(step => this.step = step);
+  set idTravel(idTravel: number) {
+    if (!this.travelService.travel) {
+      this._api.getTravel(idTravel).subscribe(travel => {
+        this.travelService.setTravel(travel);
+      });
+    }  
+  }
+  @Input()
+  set idStep(idStep: string) {
+    this.idStep_ = parseInt(idStep);
+
+    // this._api.getStep(idStep).subscribe(step => this.step = step);
+  }
+  // @ContentChild('swiper') swiperRef!: ElementRef<SwiperContainer>;
+
+  @ViewChild('swiperRef')
+  swiperRef: ElementRef | undefined;
+  swiper?: Swiper;
+
+
+  ngAfterViewInit(): void {
+    
+    this.travelService.travel$.pipe(
+      filter(travel => travel != null)
+    ).subscribe(travel => {
+      this.steps = travel.steps.features;                  
+      this._mapService.displayTravelLine(travel.steps);      
+      // TODO : improve this : must wait for the geosjon to be loaded
+      setTimeout(() => {
+        this._mapService.zoomOnLayer(this.idStep_, 9)
+      }, 1000);
+
+      let swippperStartIndex = travel.steps.features.map(step => step.id).indexOf(this.idStep_) | 0;
+      const swiperEl = document.querySelector('swiper-container');
+      const swiperParams = {
+        slidesPerView: 1,
+        // direction : "vertical",
+        pagination: true,
+        initialSlide: swippperStartIndex,
+      };
+  
+      Object.assign(swiperEl, swiperParams);
+  
+      // and now initialize it
+      swiperEl.initialize();
+      this.swiper = this.swiperRef?.nativeElement.swiper;
+      var t = document.getElementById("lala"); t
+      swiperEl.addEventListener('swiperslidechange', (event) => {
+        // pas moyen d'avoir le "activeSlide" via l'API et sans timeout on 
+        // retrouve la slide d'avant...
+        setTimeout(() => {
+          // on doit remetre la 
+          swiperEl.style.height = "auto"
+          const activeSlide = document.getElementsByClassName("swiper-slide-active")[0];
+          console.log(activeSlide);
+          
+          const currentHeight = (activeSlide as HTMLElement).offsetHeight;
+          console.log(currentHeight);
+          
+          // très moche
+          swiperEl.style.height =  currentHeight.toString()+"px";
+        }, 200);
+
+        this._mapService.zoomOnLayer(this.steps[this.swiper.activeIndex].id);
+      });
+      
+    })
   }
 
-
-  pointToLayer(feature, latLng) {    
-    let icon = L.divIcon({
-      html:`<div class="observation-marker-container ${feature.properties.isLastStep ? "last-step": ""}">
-          </div>
-        </div>`,
-      className: 'observation-marker',
-      iconSize: 32,
-      iconAnchor: [18, 28],
-    } as any);
-    return L.marker(latLng, {icon: icon});
+  findStepFromIndex(index) {
+    this.steps.find
   }
 
   addComment(){    

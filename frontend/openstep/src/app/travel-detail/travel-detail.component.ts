@@ -10,6 +10,8 @@ import {MatDividerModule} from '@angular/material/divider';
 import 'leaflet-polylinedecorator';
 import { Router } from '@angular/router';
 import { MapService } from '../map.service';
+import { TravelService } from '../travel.service';
+import { filter } from 'rxjs';
 
 
 @Component({
@@ -24,13 +26,28 @@ import { MapService } from '../map.service';
   ],
 })
 export class TravelDetailComponent implements AfterViewInit {
-  constructor(private _api: ApiService, private _router : Router, private _mapService: MapService) {}
+  constructor(private _api: ApiService, private _router : Router, public mapService: MapService, 
+    private travelService : TravelService) {}
   @ViewChild('slider') slider: ElementRef;
   public travel: any = {}
   public nonPositionelSteps = []
   @Input()
   set id(idTravel: number) {
-    this._api.getTravel(idTravel).subscribe(travel => {
+    // load travel and store it in travel service
+    // it avoid loading it on each initinialization
+    if (!this.travelService.travel) {
+      this._api.getTravel(idTravel).subscribe(travel => {
+        this.travelService.setTravel(travel)
+      });
+    }  
+  }
+
+  ngAfterViewInit (): void {
+    // this.travelService.stepsObservable.
+    this.travelService.travel$.pipe(
+      filter(travel => travel != null)
+    ).subscribe(travel => {
+      
       const steps = travel.steps;
       travel.steps.features.forEach((step: any, index) => {
         if(!step.properties.positional_step) {
@@ -38,8 +55,7 @@ export class TravelDetailComponent implements AfterViewInit {
         }
         step.properties.isLastStep = index == travel.steps.features.length -1
       });
-
-      this._mapService.displayTravelLine(travel.steps)
+      this.mapService.displayTravelLine(travel.steps)
       this.travel = travel;
 
       const swiperEl = document.querySelector('swiper-container');
@@ -50,7 +66,7 @@ export class TravelDetailComponent implements AfterViewInit {
         initialSlide: this.travel.steps.features.length,
         breakpoints: {
           640: {
-            slidesPerView: 2.5,
+            slidesPerView: 2.5
           },
           1024: {
             slidesPerView: 5.5,
@@ -67,32 +83,12 @@ export class TravelDetailComponent implements AfterViewInit {
   
       // and now initialize it
       swiperEl.initialize();
-    });
-  }
-
-  ngAfterViewInit(): void {
-   
+    })
   }
 
 
-  zoomOnLayer(idStep) {
-    for(let key in this._mapService.layers) {
-      const currentLayer: L.Marker = this._mapService.layers[key];
-      const regularIcon = this._mapService.getIcon(currentLayer.feature, false);
-      currentLayer.setIcon(regularIcon);
-    }
-    const layer = this._mapService.layers[idStep];
-    const selectedIcon = this._mapService.getIcon(layer.feature, true)
-    layer.setIcon(selectedIcon);
-    
-    if(layer) {
-      this._mapService.map.setView(layer.getLatLng(), 12)
-    }
-    
-  }
-
-  goToDetail(idStep) {    
-    this._router.navigate(["step", idStep])
+  goToDetail(idStep) {        
+    this._router.navigate(["travel", this.travel.id, "step", idStep])
   }
 
   generatePopup(feature) {
@@ -123,7 +119,7 @@ export class TravelDetailComponent implements AfterViewInit {
   }
 
   pointToLayer(feature, latLng) {    
-    const marker = this._mapService.pointToLayer(feature, latLng);
+    const marker = this.mapService.pointToLayer(feature, latLng);
     marker.bindPopup(this.generatePopup(feature));
     marker.on('click', function (e) {
         this.openPopup();
