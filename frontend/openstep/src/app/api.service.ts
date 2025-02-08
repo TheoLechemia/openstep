@@ -27,8 +27,6 @@ export class ApiService {
   }
 
   postComment(data: any): Observable<any> {
-    console.log("donc data", data);
-    
     return this._http.post<any>(
       `${this.configService.config.API_ENDPOINT}/comments/`, data)
   }

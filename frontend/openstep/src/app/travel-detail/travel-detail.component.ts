@@ -27,13 +27,18 @@ export class TravelDetailComponent implements AfterViewInit {
   constructor(private _api: ApiService, private _router : Router, private _mapService: MapService) {}
   @ViewChild('slider') slider: ElementRef;
   public travel: any = {}
+  public nonPositionelSteps = []
   @Input()
   set id(idTravel: number) {
     this._api.getTravel(idTravel).subscribe(travel => {
       const steps = travel.steps;
       travel.steps.features.forEach((step: any, index) => {
+        if(!step.properties.positional_step) {
+          this.nonPositionelSteps.push(step)
+        }
         step.properties.isLastStep = index == travel.steps.features.length -1
       });
+
       this._mapService.displayTravelLine(travel.steps)
       this.travel = travel;
 

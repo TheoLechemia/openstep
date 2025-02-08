@@ -1,11 +1,8 @@
-from typing import Any, Mapping
 from django import forms
 from django.contrib import admin
 from django.contrib.gis.admin import GISModelAdmin
-from django.core.files.base import File
-from django.db.models.base import Model
-from django.forms.utils import ErrorList
 from django.utils.safestring import mark_safe
+from django.utils.translation import gettext_lazy as _
 from tinymce.widgets import TinyMCE
 
 
@@ -14,6 +11,11 @@ from step.models import Step, Travel, Media, Comments
 
 
 class StepForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(StepForm, self).__init__(*args, **kwargs)
+        self.fields['positional_step'].help_text = _('A positional step is a step without description and media. It just help to draw the travel on the map')
+        # HACK : pourquoi on doit passer ce champs à faux à la main alors qu'il est en null=true dans le model ?
+        self.fields["name"].required = False
     class Meta:
         widgets = {
             "description": TinyMCE()
@@ -38,7 +40,7 @@ class StepAdmin(GISModelAdmin):
     form = StepForm
     inlines = [MediaInline]
     list_display = ("name", "description", "media_preview",)
-    fields = ("travel", "name", "date", "location", "description")
+    fields = ("travel", "positional_step", "name", "date", "location", "description")
 
     @admin.display(description="Media")
     def media_preview(self, obj):

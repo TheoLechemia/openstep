@@ -30,7 +30,7 @@ class StepSerializer(gis_serializers.GeoFeatureModelSerializer):
     class Meta:
         model = Step
         fields = (
-            'travel', 'comments', 'id', 'name', 'location', 'description', 'date', 'medias', 'first_media', 'day_of_travel', "country", "state")
+            'travel', 'positional_step', 'comments', 'id', 'name', 'location', 'description', 'date', 'medias', 'first_media', 'day_of_travel', "country", "state")
         geo_field = "location"
 
 

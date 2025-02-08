@@ -27,8 +27,9 @@ class Travel(models.Model):
 
 
 class Step(models.Model):
-    name = models.CharField()
+    name = models.CharField(null=True)
     date = models.DateField()
+    positional_step = models.BooleanField(null=False, default=False, verbose_name=_("Positional step"))
     location = models.PointField(srid=4326, verbose_name=_("Location"))
     country = models.CharField(null=True, blank=True)
     state = models.CharField(null=True, blank=True)
@@ -59,8 +60,6 @@ class Step(models.Model):
     class Meta:
         ordering = ["date"]
 
-    def __str__(self) -> str:
-        return self.name
     
     @property
     def first_media(self):

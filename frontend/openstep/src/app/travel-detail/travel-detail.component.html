@@ -71,7 +71,7 @@
     class="mySwiper" 
     >
 
-    @for (step of travel?.steps?.features; track step.id) {
+    @for (step of nonPositionelSteps; track step.id) {
         <swiper-slide class="height-100 ">
             <mat-card class="step-card height-100 width-100">
                 <img class="step-img" (click)="goToDetail(step.id)" #img mat-card-image src="{{step.properties.first_media?.media_file}}" alt="">
