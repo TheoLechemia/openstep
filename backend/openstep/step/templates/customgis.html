@@ -1,0 +1,40 @@
+{% extends "gis/openlayers-osm.html" %}
+{% load l10n %}
+
+{% block base_layer %}
+
+
+var base_layer = new ol.layer.Tile({
+    source: new ol.source.XYZ({
+        attributions: "ArcGIS c'est super",
+        url: "https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}"
+    })
+});
+
+{% endblock %}
+
+{% block options %}
+{{ block.super }}
+function getLocation() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(function(position) {
+          geodjango_location.map.getView().setCenter(
+            ol.proj.transform(
+                [position.coords.longitude, position.coords.latitude], 
+                'EPSG:4326', 'EPSG:3857'
+            )
+        );
+      });
+    }
+  }
+// HACK because django gis do not expose the map instance. We must wait for it to be created and then run
+// the geolocation function ...
+  setTimeout(() => {
+      console.log(geodjango_location)
+      getLocation();
+  }, 1000);
+
+  
+
+{% endblock %}
+

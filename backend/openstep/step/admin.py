@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib import admin
 from django.contrib.gis.admin import GISModelAdmin
+from django.contrib.gis.forms.widgets import OSMWidget
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 from tinymce.widgets import TinyMCE
@@ -36,7 +37,11 @@ class MediaInline(admin.TabularInline):
         )
 
 
-class StepAdmin(GISModelAdmin):
+class CustomGeoWidget(OSMWidget):
+    template_name = 'customgis.html'
+
+class StepAdmin(GISModelAdmin):        
+    gis_widget = CustomGeoWidget
     form = StepForm
     inlines = [MediaInline]
     list_display = ("name", "description", "media_preview",)
