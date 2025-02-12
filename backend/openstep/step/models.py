@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Any, Iterable
 from django.contrib.gis.db import models
+from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _
 from django.utils.timezone import now
 
@@ -9,6 +10,14 @@ from django_resized import ResizedImageField
 from geopy.geocoders import Nominatim
 
 # Create your models here.
+
+class TravelManager(models.Manager):
+    def get_authorized(self, request):
+        if request.user.is_superuser:
+            return super().get_queryset()
+        return self.all().prefetch_related("owners").filter(owners__id=request.user.id)
+
+
 
 class Travel(models.Model):
     name = models.CharField(max_length=200)
@@ -21,7 +30,11 @@ class Travel(models.Model):
         quality=85,
         force_format="JPEG"
     )
+    owners = models.ManyToManyField(User)
 
+    objects = TravelManager()
+
+    # def filter_query_
     def __str__(self) -> str:
         return self.name
 
