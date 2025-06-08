@@ -149,7 +149,7 @@ export class StepDetailComponent implements AfterViewInit  {
         // UGLY
         setTimeout(() => {          
           this._mapService.displayTravelLine(travel.steps);
-          this._mapService.zoomOnLayer(this.idStep_);
+          this._mapService.zoomOnLayer(this.idStep_, 10);
         }, 500)
       });      
     })
