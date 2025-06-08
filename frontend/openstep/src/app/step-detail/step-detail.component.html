@@ -1,29 +1,41 @@
-@if(steps) {
-    <div class="row height-100 g-0">
+<div id="left-swipper">
+
+</div>   
+   
+   <div id="main" class="row height-100 g-0">
         <div class="col-12 col-md-7 order-md-2" id="map-container">
             <app-map [geojson]="steps"></app-map>
         </div>
         <div class="col-12 col-md-5 order-md-1 height-100" id="detail-container">
-            <div class="description-padding">
+            <div class="">
                 <a [routerLink]="['/travel', travelService.travel?.id]"> 
                      <small class="me-2 primary-color">  {{travelService.travel?.name}} </small>
                 </a>
 
+                <mat-icon class="swipe-icon">swipe</mat-icon>
+
             </div>
-            <swiper-container 
+            <!-- <swiper-container 
                 #swiperRef
                 init="false"
                 id="caroussel-container" 
                 class="mySwiper" 
-            >
-                @for (step of steps; track step.id; let i = $index) {
-                <div>
+            > -->
+                <!-- @for (step of steps; track step.id; let i = $index) { -->
 
-                </div>
-                    <swiper-slide>
-                        <div class="description-padding">
+                    <!-- <swiper-slide> -->
+                    @if(step) {
+
+                        <div class="description-padding head-step">
                             <h3 > {{step.properties.name}}  </h3>
 
+
+                            <button (click)="previousStep()" class="left"  mat-mini-fab>
+                                <mat-icon>chevron_left</mat-icon>
+                            </button>
+                            <button (click)="nextStep()"  class="right"  mat-mini-fab>
+                                <mat-icon>chevron_right</mat-icon>
+                            </button>
                             <div class="icon-text mb-2">
                                 <mat-icon class="me-1">location_on</mat-icon>
                                 <span> {{step.properties.country}} - {{step.properties.state}} </span>
@@ -35,14 +47,11 @@
                             <p class="mt-2" [innerHTML]="step.properties.description" >
                             <p style="display: none;">medias</p>
                         </div>
-                        <carousel>
-                            @for(media of step.properties.medias; track media.id) {
-                                
+                        <!-- No loop no working... -->
+                        <carousel [interval]="1500000000">
+                            @for(media of step.properties.medias; track media.id; let i = $index) {
                                 <slide style="cursor: pointer;">
-                                    <a href="{{media.media_file}}">
-                                        <img src="{{media.media_file}}" alt="second slide" style="display: block; width: 100%;">
-        
-                                    </a>
+                                    <img src="{{media.src}}" (click)="open(i)" style="display: block; width: 100%;">
                                 </slide>
                             }
                             
@@ -82,94 +91,17 @@
         
                         </div>
                         <br>
-
-                    </swiper-slide>
-                
-                }
-            </swiper-container>
-        </div>
-        
-
-        <!-- @if(step) {
-
-
-            <div class="col-12 col-md-5 order-md-1" id="detail-container">
-                <div class="description-padding">
-                    <a [routerLink]="['/travel', step.properties.travel.id]">
-                        <small class="me-2 primary-color">  {{ step.properties.travel.name}} </small>
-                    </a>
-                        <h3 > {{step.properties.name}}  </h3>
-
-            
-                    <div class="icon-text mb-2">
-                        <mat-icon class="me-1">location_on</mat-icon>
-                        <span> {{step.properties.country}} - {{step.properties.state}} </span>
-                    </div>
-                    <span class="icon-text mb-4">
-                        <mat-icon class="me-1">calendar_month</mat-icon>
-                        <span> Day {{step.properties.day_of_travel}} - {{step.properties.date  |date: 'dd MMM yyyy' }} </span>
-                    </span>
-                    
-        
-                
-                    <p class="mt-2" [innerHTML]="step.properties.description" >
-        
-                    <p style="display: none;">medias</p>
-                </div>
-                <carousel>
-                    @for(media of step.properties.medias; track step.properties.medias.id) {
-                        
-                        <slide style="cursor: pointer;">
-                            <a href="{{media.media_file}}">
-                                <img src="{{media.media_file}}" alt="second slide" style="display: block; width: 100%;">
-
-                            </a>
-                        </slide>
                     }
-                    
-                </carousel>
+
+                    <!-- </swiper-slide> -->
                 
-                <div class="description-padding" >
-
-                    <mat-divider class="mt-4 mb-4 ps-1"></mat-divider>
-                    <mat-list>
-                        @for(comment of step.properties.comments; track comment) {
-
-                            <p>
-                                    <mat-icon matListItemIcon>mood</mat-icon>
-
-                                {{comment.message}} <br>
-                                    <small class="text-muted">
-                                        {{comment.date | date:'short'}}
-                                    </small>
-                            </p>
-
-                        }
-
-                    </mat-list>
-
-                    <div class="row">
-
-                        <mat-form-field class="col-10" appearance="outline">
-                            <mat-label>Comment</mat-label>
-                            <textarea [(ngModel)]="commentMessage" matInput placeholder="Comment"> </textarea>
-                            <mat-icon matSuffix>comment</mat-icon>
-                        </mat-form-field>
-    
-                        <button (click)="addComment()" class="ms-2 col-2 mt-3" mat-mini-fab aria-label="Example icon button with a home icon">
-                            <mat-icon>send</mat-icon>
-                          </button>                
-                    </div>
-
-                </div>
-                
-            </div>
-        } -->
+                <!-- } -->
+            <!-- </swiper-container> -->
+        </div>
 
 
 
 
     </div>
 
-}
 

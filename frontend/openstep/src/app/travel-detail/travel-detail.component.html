@@ -74,7 +74,7 @@
     @for (step of nonPositionelSteps; track step.id) {
         <swiper-slide class="height-100 ">
             <mat-card class="step-card height-100 width-100">
-                <img class="step-img" (click)="goToDetail(step.id)" #img mat-card-image src="{{step.properties.first_media?.media_file}}" alt="">
+                <img class="step-img" (click)="goToDetail(step.id)" #img mat-card-image src="{{step.properties.first_media?.src}}" alt="">
                 <div class="float-info">
                     <div (click)="goToDetail(step.id)"  class="info-overlay">
                         <h4> {{step.properties.name}} </h4>

@@ -21,10 +21,13 @@
     "@angular/platform-browser-dynamic": "^18.2.0",
     "@angular/router": "^18.2.0",
     "bootstrap": "^5.3.3",
+    "interactjs": "^1.10.27",
     "leaflet": "^1.9.4",
     "leaflet-polylinedecorator": "^1.6.0",
     "ngx-bootstrap": "^18.0.2",
+    "ngx-lightbox": "^3.0.0",
     "rxjs": "~7.8.0",
+    "swiped-events": "^1.2.0",
     "swiper": "^11.1.15",
     "tslib": "^2.3.0",
     "zone.js": "~0.14.10"

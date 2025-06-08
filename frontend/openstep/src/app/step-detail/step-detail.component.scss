@@ -28,7 +28,12 @@
 }
 
 .description-padding {
-    padding: 0.5rem 1rem 0rem 1rem;
+    padding: 0.5rem 1rem 0rem 2.5rem;
+}
+
+.head-step {
+    text-align: center;
+
 }
 
 
@@ -47,3 +52,57 @@
 //     height: 100%;
 //     object-fit: cover;
 //   }
+
+#main {
+    touch-action: none;
+    user-select: none;
+}
+
+#left-swipper {
+    background: linear-gradient(90deg, rgba(0,0,0,0.7679446778711485) 0%, rgba(0,0,0,0) 43%);
+    position: absolute;
+    height: 100vh;
+    width: 30%;
+    z-index: 1000;
+    display: none;
+  }
+
+.left {
+    display: none;
+    position: absolute;
+    left: 0;
+}
+
+.right {
+    display: none;
+    position: relative;
+    left: 92%;
+}
+
+@media (min-width: 768px) {
+    .right, .left {
+        display: block;
+    }
+}
+
+@media (min-width: 768px) {
+    .swipe-icon {
+        display: none;
+    }
+
+}
+
+@keyframes horizontal-shaking {
+    0% { transform: translateX(0) }
+    25% { transform: translateX(10px) }
+    50% { transform: translateX(-10px) }
+    75% { transform: translateX(10px) }
+    100% { transform: translateX(0) }
+   }
+
+.swipe-icon {
+    // color: #00000065!important;
+    position: absolute;
+    right: 5%;
+    animation: horizontal-shaking 1.5s 1s;
+}

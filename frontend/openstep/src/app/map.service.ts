@@ -8,18 +8,19 @@ export class MapService {
   constructor() {     
   }
 
-  pointToLayer(feature, latLng) {
+  pointToLayer(feature, latLng) {     
     const icon = this.getIcon(feature, false);
     const marker = L.marker(latLng, {icon: icon});
-    marker.getLatLng
     this.layers[feature.id] = marker;    
     return marker;
   }
 
   zoomOnLayer(idStep, zoomLevel=12) {
-    for(let key in this.layers) {
+    
+    // reset layer style not working ...
+    for(let key in this.layers) {      
       const currentLayer: L.Marker = this.layers[key];
-      const regularIcon = this.getIcon(currentLayer.feature, false);
+      const regularIcon = this.getIcon(currentLayer.feature, false);      
       currentLayer.setIcon(regularIcon);
     }
     const layer = this.layers[idStep];
@@ -40,15 +41,12 @@ export class MapService {
       html:`<div class=" ${feature.properties.positional_step ? "positional-marker-container" : "observation-marker-container"} ${selected ? "selected-marker": ""} ${feature.properties.isLastStep ? "last-step": ""}">
           </div>
         </div>`,
-      className: 'observation-marker',
+      className: "",
       iconSize: 32,
       iconAnchor: [18, 28],
     } as any);
   }
 
-  setSelectedLayer() {
-
-  }
 
   displayTravelLine(geojson) {
     const arrayCoords = [];

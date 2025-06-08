@@ -29,10 +29,9 @@ export class MapComponent implements OnInit, OnChanges {
     }).addTo(this.mapService.map);  
   }
 
-
-
   ngOnChanges(changes: SimpleChanges): void {
     if(changes["geojson"] && changes["geojson"].currentValue) {
+      
       const layer = L.geoJson(changes["geojson"].currentValue, {
         pointToLayer : this.pointToLayer ? this.pointToLayer: this.mapService.pointToLayer.bind(this.mapService)
       });

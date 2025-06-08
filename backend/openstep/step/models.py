@@ -73,6 +73,8 @@ class Step(models.Model):
     class Meta:
         ordering = ["date"]
 
+    def __str__(self) -> str:
+        return self.name or ''
     
     @property
     def first_media(self):

@@ -12,9 +12,12 @@ class CommentSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 class MediaSerializer(serializers.ModelSerializer):
+    caption = serializers.CharField(source="legend")
+    src = serializers.ImageField(source="media_file")
+    thumb = serializers.ImageField(source="media_file")
     class Meta:
         model = Media
-        fields = ('id', 'legend','media_file',)
+        fields = ('id','src', "thumb", "caption")
 
 class TravelSerializerNoStep(serializers.ModelSerializer):
     class Meta:
