@@ -35,8 +35,9 @@ export class TravelDetailComponent implements AfterViewInit {
   set id(idTravel: number) {
     // load travel and store it in travel service
     // it avoid loading it on each initinialization
-    if (!this.travelService.travel) {
+    if (!this.id || this.id != this.travelService.currentTravelId) {
       this._api.getTravel(idTravel).subscribe(travel => {
+        this.travelService.currentTravelId = travel.id;
         this.travelService.setTravel(travel)
       });
     }  

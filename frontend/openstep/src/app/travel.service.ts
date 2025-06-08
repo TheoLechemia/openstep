@@ -5,7 +5,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class TravelService {
-
+  public currentTravelId: number;
   public stepsObservable = new BehaviorSubject(null);;
   constructor() { 
     
