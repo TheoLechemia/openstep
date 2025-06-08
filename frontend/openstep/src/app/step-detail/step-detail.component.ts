@@ -25,14 +25,15 @@ import { TravelService } from '../travel.service';
 import { filter } from 'rxjs';
 import { SwiperContainer } from 'swiper/element';
 import { Swiper } from 'swiper/types';
-import interact from 'interactjs'
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+
 
 
 
 @Component({
   selector: 'app-step-detail',
   standalone: true,
-  imports: [RouterLink, DatePipe, FormsModule, MatSuffix, MatInputModule,MatListModule, MatFormFieldModule, MapComponent, MatDivider, CarouselModule, LightboxModule, MatButtonModule, DatePipe,  MatIcon, CommonModule],
+  imports: [RouterLink, DatePipe, FormsModule, MatSuffix, MatInputModule,MatListModule, MatFormFieldModule, MapComponent, MatDivider, CarouselModule, LightboxModule, MatButtonModule, DatePipe,  MatIcon, CommonModule, MatProgressSpinnerModule],
   templateUrl: './step-detail.component.html',
   styleUrl: './step-detail.component.scss',
   providers: [MapService],
@@ -45,6 +46,7 @@ export class StepDetailComponent implements AfterViewInit  {
   public step: any;
   public idStep_: number;
   public idTravel: number;
+  public currentIdtravel: number;
   readonly dialog = inject(MatDialog);
   public commentMessage: string;
   public stepIndexInTravel: number;
@@ -52,7 +54,7 @@ export class StepDetailComponent implements AfterViewInit  {
   swiperRef: ElementRef | undefined;
   swiper?: Swiper;
 
-  ngAfterViewInit(): void {
+  ngAfterViewInit(): void {    
 
     // interact('#rotate-area').gesturable({
     //   onmove: function (event) {
@@ -96,11 +98,11 @@ export class StepDetailComponent implements AfterViewInit  {
     // })
 
 
-    addEventListener("touchstart", (event) => {
+    // addEventListener("touchstart", (event) => {
 
-      console.log(event);
+    //   console.log(event);
       
-    });
+    // });
 
     // addEventListener("touchmove", (event) => {
 
@@ -108,13 +110,13 @@ export class StepDetailComponent implements AfterViewInit  {
       
     // });
 
-    addEventListener("touchend", (event) => {
+    // addEventListener("touchend", (event) => {
 
-      console.log("enddd", event);
-      console.log(event.changedTouches[0].pageX);
+    //   console.log("enddd", event);
+    //   console.log(event.changedTouches[0].pageX);
       
       
-    });
+    // });
 
 
     // document.addEventListener('swiped', (e:any) => {
@@ -132,8 +134,10 @@ export class StepDetailComponent implements AfterViewInit  {
     // });
 
     this._route.params.subscribe(route => {
-        const swipe = document.getElementById("left-swipper");
-        swipe.style.display = "none"
+      // TODO : ne pas recharger le travel à chaque fois !!
+      this.step = null;
+      const swipe = document.getElementById("left-swipper");
+      swipe.style.display = "none"
       this.idTravel = parseInt(route["idTravel"]);
       this.idStep_ =  parseInt(route["idStep"]);
 
@@ -149,8 +153,8 @@ export class StepDetailComponent implements AfterViewInit  {
         // UGLY
         setTimeout(() => {          
           this._mapService.displayTravelLine(travel.steps);
-          this._mapService.zoomOnLayer(this.idStep_, 10);
-        }, 500)
+          this._mapService.zoomOnLayer(this.idStep_, 8);
+        }, 200)
       });      
     })
   }
@@ -174,11 +178,8 @@ export class StepDetailComponent implements AfterViewInit  {
     const previousIndex = this.stepIndexInTravel - 1;
     
     if(previousIndex < 0) {
-      console.log("first step");
       
-    } else {
-      console.log(this.steps);
-      
+    } else {      
       const previousIdStep = this.steps[previousIndex].id;
       this._router.navigate(["travel", this.idTravel, "step", previousIdStep])
     }

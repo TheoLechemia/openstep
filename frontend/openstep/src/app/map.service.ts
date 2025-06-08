@@ -35,8 +35,6 @@ export class MapService {
 
 
   getIcon(feature, selected:boolean= false) {
-    console.log(feature.properties.positional_step);
-    
     return L.divIcon({
       html:`<div class=" ${feature.properties.positional_step ? "positional-marker-container" : "observation-marker-container"} ${selected ? "selected-marker": ""} ${feature.properties.isLastStep ? "last-step": ""}">
           </div>
