@@ -161,8 +161,12 @@ export class StepDetailComponent implements AfterViewInit  {
     })
   }
 
-  zoomOnLayer() {    
-      this._mapService.zoomOnLayer(this.idStep_, 8);
+  zoomOnLayer() {  
+    // Moche mais trouve pas comment faire d'autre      
+    setTimeout(()=> {          
+          this._mapService.zoomOnLayer(this.idStep_, 15);
+
+      }, 200)
   }
 
   setStepsAndStep(travel, idStep) {
@@ -173,9 +177,13 @@ export class StepDetailComponent implements AfterViewInit  {
       });
       
       this._mapService.displayTravelLine(travel.steps);
-      if(this._mapService.layers) {
-        this._mapService.zoomOnLayer(this.idStep_, 8);
-      }
+
+      setTimeout(()=> {
+    // Moche mais trouve pas comment faire d'autre      
+          
+          this._mapService.zoomOnLayer(this.idStep_, 15);
+
+      }, 200)
   }
 
   open(index) {
