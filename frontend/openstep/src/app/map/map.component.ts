@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, OnChanges, ViewChild, ElementRef, SimpleChanges } from '@angular/core';
+import { Component, OnInit, Input, OnChanges, ViewChild, ElementRef, SimpleChanges, Output, output, EventEmitter } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import * as L from "leaflet"
 import { latLng } from 'leaflet';
@@ -16,6 +16,7 @@ export class MapComponent implements OnInit, OnChanges {
   constructor(public mapService: MapService) {}
   @Input() geojson: any;
   @Input() pointToLayer: any;
+  @Output() layerLoaded = new EventEmitter<any>();
   public map: L.Map;
   // @ViewChild('map') mapContainer: ElementRef;
   @ViewChild('map', { static: true }) mapContainer: ElementRef;
@@ -30,11 +31,12 @@ export class MapComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if(changes["geojson"] && changes["geojson"].currentValue) {
-      
+    if(changes["geojson"] && changes["geojson"].currentValue && Array.isArray(changes["geojson"].currentValue) && changes["geojson"].currentValue.length > 0 ) {
       const layer = L.geoJson(changes["geojson"].currentValue, {
         pointToLayer : this.pointToLayer ? this.pointToLayer: this.mapService.pointToLayer.bind(this.mapService)
       });
+      
+      this.layerLoaded.emit();
       
       
       if(this.mapService.map) {

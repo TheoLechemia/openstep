@@ -134,37 +134,59 @@ export class StepDetailComponent implements AfterViewInit  {
     // });
 
     this._route.params.subscribe(route => {
+      const currentIdTravel = parseInt(route["idTravel"]);
       // TODO : ne pas recharger le travel à chaque fois !!
       this.step = null;
       const swipe = document.getElementById("left-swipper");
       swipe.style.display = "none"
-      this.idTravel = parseInt(route["idTravel"]);
+      this.idTravel = currentIdTravel;
       this.idStep_ =  parseInt(route["idStep"]);
+      if(this.travelService.travel && this.travelService.travel.id == currentIdTravel) {
+        this.setStepsAndStep(this.travelService.travel, this.idStep_)
+      }
+      if(this.travelService.travel && this.travelService.travel.id != currentIdTravel) {
+        console.log("c'est pas le meme !");
+          this._api.getTravel(currentIdTravel).subscribe(travel => {
+          this.travelService.setTravel(travel);
+          this.setStepsAndStep(travel, this.idStep_)
+        });    
+      }
+      if(!this.travelService.travel) {
+        this._api.getTravel(currentIdTravel).subscribe(travel => {
+          this.travelService.setTravel(travel);
+          this.setStepsAndStep(travel, this.idStep_)
+        });      
 
-      
-      this._api.getTravel(this.idTravel).subscribe(travel => {
-        this.travelService.setTravel(travel);
-        this.steps = travel.steps.features;
-        this.step = this.travelService.travel.steps.features.find(step => {
-          return step.id == this.idStep_
-        });
-        this.stepIndexInTravel = travel.steps.features.map(step => step.id).indexOf(this.idStep_) | 0;
-        
-        // UGLY
-        setTimeout(() => {          
-          this._mapService.displayTravelLine(travel.steps);
-          this._mapService.zoomOnLayer(this.idStep_, 8);
-        }, 200)
-      });      
+      }
     })
+  }
+
+  zoomOnLayer() {    
+      this._mapService.zoomOnLayer(this.idStep_, 8);
+  }
+
+  setStepsAndStep(travel, idStep) {
+      this.stepIndexInTravel = travel.steps.features.map(step => step.id).indexOf(idStep) | 0;
+      this.steps = travel.steps.features;
+      this.step = travel.steps.features.find(step => {
+        return step.id == idStep
+      });
+      
+      this._mapService.displayTravelLine(travel.steps);
+      if(this._mapService.layers) {
+        this._mapService.zoomOnLayer(this.idStep_, 8);
+      }
   }
 
   open(index) {
     this._lightbox.open(this.step.properties.medias, index);
   }
 
+
   nextStep() {    
     const nextIndex = this.stepIndexInTravel + 1;
+    console.log(nextIndex);
+    
     if(nextIndex == this.steps.length) {
       console.log("last step");
       

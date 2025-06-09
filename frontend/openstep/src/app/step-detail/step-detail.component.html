@@ -4,7 +4,7 @@
    
    <div id="main" class="row height-100 g-0">
         <div class="col-12 col-md-7 order-md-2" id="map-container">
-            <app-map [geojson]="steps"></app-map>
+            <app-map [geojson]="steps" (layerLoaded)="zoomOnLayer()" ></app-map>
         </div>
         <div class="col-12 col-md-5 order-md-1 height-100" id="detail-container">
             <div class="">

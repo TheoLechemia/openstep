@@ -8,16 +8,16 @@ export class MapService {
   constructor() {     
   }
 
-  pointToLayer(feature, latLng) {     
+  pointToLayer(feature, latLng) {         
     const icon = this.getIcon(feature, false);
     const marker = L.marker(latLng, {icon: icon});
-    this.layers[feature.id] = marker;    
+    this.layers[feature.id] = marker;      
     return marker;
   }
 
   zoomOnLayer(idStep, zoomLevel=12) {
     
-    // reset layer style not working ...
+    // reset layer style not working ...    
     for(let key in this.layers) {      
       const currentLayer: L.Marker = this.layers[key];
       const regularIcon = this.getIcon(currentLayer.feature, false);      

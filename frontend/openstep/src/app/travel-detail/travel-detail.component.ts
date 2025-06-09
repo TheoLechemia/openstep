@@ -31,6 +31,7 @@ export class TravelDetailComponent implements AfterViewInit {
   @ViewChild('slider') slider: ElementRef;
   public travel: any = {}
   public nonPositionelSteps = []
+  public steps: Array<any>;
   @Input()
   set id(idTravel: number) {
     // load travel and store it in travel service
@@ -49,7 +50,7 @@ export class TravelDetailComponent implements AfterViewInit {
       filter(travel => travel != null)
     ).subscribe(travel => {
       
-      const steps = travel.steps;
+      this.steps = travel.steps.features;
       travel.steps.features.forEach((step: any, index) => {
         if(!step.properties.positional_step) {
           this.nonPositionelSteps.push(step)
