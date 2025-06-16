@@ -1,4 +1,4 @@
-import { Component, Input, ViewChild, ElementRef } from '@angular/core';
+import { Component, Input, ViewChild, ElementRef, CUSTOM_ELEMENTS_SCHEMA, AfterViewInit } from '@angular/core';
 import {  DatePipe } from '@angular/common';
 
 import { MapComponent } from '../map/map.component';
@@ -10,59 +10,87 @@ import {MatDividerModule} from '@angular/material/divider';
 import 'leaflet-polylinedecorator';
 import { Router } from '@angular/router';
 import { MapService } from '../map.service';
+import { TravelService } from '../travel.service';
+import { filter } from 'rxjs';
 
 
 @Component({
-  selector: 'app-travel-detail',
+  selector: 'app-travel-detaisl',
   standalone: true,
   imports: [MapComponent, MatIcon, MatCardModule, MatButtonModule, MatDividerModule, DatePipe],
   templateUrl: './travel-detail.component.html',
   styleUrl: './travel-detail.component.scss',
-  providers: [MapService]
+  providers: [MapService],
+  schemas: [
+    CUSTOM_ELEMENTS_SCHEMA
+  ],
 })
-export class TravelDetailComponent {
-  constructor(private _api: ApiService, private _router : Router, private _mapService: MapService) {}
+export class TravelDetailComponent implements AfterViewInit {
+  constructor(private _api: ApiService, private _router : Router, public mapService: MapService, 
+    private travelService : TravelService) {}
   @ViewChild('slider') slider: ElementRef;
   public travel: any = {}
+  public nonPositionelSteps = []
+  public steps: Array<any>;
   @Input()
   set id(idTravel: number) {
-    this._api.getTravel(idTravel).subscribe(travel => {
-      const steps = travel.steps;
+    // load travel and store it in travel service
+    // it avoid loading it on each initinialization
+    if (!this.id || this.id != this.travelService.currentTravelId) {
+      this._api.getTravel(idTravel).subscribe(travel => {
+        this.travelService.currentTravelId = travel.id;
+        this.travelService.setTravel(travel)
+      });
+    }  
+  }
+
+  ngAfterViewInit (): void {
+    // this.travelService.stepsObservable.
+    this.travelService.travel$.pipe(
+      filter(travel => travel != null)
+    ).subscribe(travel => {
+      
+      this.steps = travel.steps.features;
       travel.steps.features.forEach((step: any, index) => {
+        if(!step.properties.positional_step) {
+          this.nonPositionelSteps.push(step)
+        }
         step.properties.isLastStep = index == travel.steps.features.length -1
       });
-      this._mapService.displayTravelLine(travel.steps)
+      this.mapService.displayTravelLine(travel.steps)
       this.travel = travel;
-      
-      setTimeout(() => {
-        this.slider.nativeElement.scrollBy({
-          left : this.slider.nativeElement.scrollWidth,
-          behavior: 'smooth',
-          
-        })
-      }, 500);
-    });
+
+      const swiperEl = document.querySelector('swiper-container');
+      const swiperParams = {
+        gridRow: 1,
+        mousewheel: true,
+        slidesPerView: 1.5,
+        initialSlide: this.travel.steps.features.length,
+        breakpoints: {
+          640: {
+            slidesPerView: 2.5
+          },
+          1024: {
+            slidesPerView: 5.5,
+          },
+        },
+        on: {
+          init() {
+            // ...
+          },
+        },
+      };
+  
+      Object.assign(swiperEl, swiperParams);
+  
+      // and now initialize it
+      swiperEl.initialize();
+    })
   }
 
 
-  zoomOnLayer(idStep) {
-    for(let key in this._mapService.layers) {
-      const currentLayer: L.Marker = this._mapService.layers[key];
-      const regularIcon = this._mapService.getIcon(currentLayer.feature, false);
-      currentLayer.setIcon(regularIcon);
-    }
-    const layer = this._mapService.layers[idStep];
-    const selectedIcon = this._mapService.getIcon(layer.feature, true)
-    layer.setIcon(selectedIcon);
-    
-    if(layer) {
-      this._mapService.map.setView(layer.getLatLng(), 12)
-    }
-    
-  }
-
-  goToDetail(idStep) {    
-    this._router.navigate(["step", idStep])
+  goToDetail(idStep) {        
+    this._router.navigate(["travel", this.travel.id, "step", idStep])
   }
 
   generatePopup(feature) {
@@ -93,7 +121,7 @@ export class TravelDetailComponent {
   }
 
   pointToLayer(feature, latLng) {    
-    const marker = this._mapService.pointToLayer(feature, latLng);
+    const marker = this.mapService.pointToLayer(feature, latLng);
     marker.bindPopup(this.generatePopup(feature));
     marker.on('click', function (e) {
         this.openPopup();

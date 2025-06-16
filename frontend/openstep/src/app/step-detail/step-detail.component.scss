@@ -1,5 +1,5 @@
 #map-container {
-    height: 20% ;
+    height: 35% ;
 }
 
 @media (min-width: 768px) {
@@ -7,6 +7,7 @@
         height: 100% ;
     }
 }
+
 
 .mat-list-item.mat-list-item-word-wrap {
     height: initial !important;
@@ -17,7 +18,7 @@
   }
 
 #detail-container {
-    height: 80% ;
+    height: 65% ;
     overflow-y: auto;
 }
 
@@ -31,16 +32,101 @@
     padding: 0.5rem 1rem 0rem 1rem;
 }
 
-.flex {
-    display: flex;
-    flex-direction: row;
+.head-step {
+    text-align: center;
+
+}
+.desc{
+    text-align: justify;
 }
 
 
-.step-img {
-    // height: fit-content; //so that it takes up full space
-//     max-height: 20vh !important; // this prevents the image from being extremely big
-//     object-fit: cover; 
-//     object-position: center
+//   swiper-slide {
+//     text-align: center;
+//     font-size: 18px;
+//     background: #fff;
+//     display: flex;
+//     justify-content: center;
+//     align-items: center;
+//   }
 
+//   swiper-slide img {
+//     display: block;
+//     width: 100%;
+//     height: 100%;
+//     object-fit: cover;
+//   }
+
+#main {
+    touch-action: none;
+    user-select: none;
 }
+
+#left-swipper {
+    background: linear-gradient(90deg, rgba(0,0,0,0.7679446778711485) 0%, rgba(0,0,0,0) 43%);
+    position: absolute;
+    height: 100vh;
+    width: 30%;
+    z-index: 1000;
+    display: none;
+  }
+
+.left {
+    z-index: 1000;
+    // display: block;
+    position: absolute;
+    left: 0%;
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+}
+
+.btn-steps {
+    opacity: 0.8;
+    width: 30px;
+}
+
+.right {
+    z-index: 1000;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+    position: absolute;
+    right: 0%;
+}
+
+@media (min-width: 768px) {
+    .right {
+        position: relative;
+        right: -48%;
+    }
+    .left {
+        position: relative;
+        left: -48%;
+    }
+}
+
+.center {
+      width: 50%;
+  margin: 0 auto;
+}
+
+// @media (min-width: 768px) {
+//     .swipe-icon {
+//         display: none;
+//     }
+
+// }
+
+// @keyframes horizontal-shaking {
+//     0% { transform: translateX(0) }
+//     25% { transform: translateX(10px) }
+//     50% { transform: translateX(-10px) }
+//     75% { transform: translateX(10px) }
+//     100% { transform: translateX(0) }
+//    }
+
+// .swipe-icon {
+//     // color: #00000065!important;
+//     position: absolute;
+//     right: 5%;
+//     animation: horizontal-shaking 1.5s 1s;
+// }

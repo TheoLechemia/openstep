@@ -65,6 +65,8 @@ html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
 
+
+
 .observation-marker-container {
   position: relative;
   display: flex;
@@ -86,7 +88,12 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 }
 
 .selected-marker {
-    box-shadow: 0 0 0 4px rgb(255, 196, 0), 0 0 0 6px rgba(255, 196, 0, 0.527);
+  background-color: var(--mdc-fab-small-container-color, var(--mat-app-primary-container))
+    // box-shadow: 0 0 0 4px rgb(255, 196, 0), 0 0 0 6px rgba(255, 196, 0, 0.527);
+}
+
+.not-selected {
+  box-shadow: 0 0 0 4px rgba(255, 0, 234, 0), 0 0 0 6px rgba(255, 196, 0, 0);
 }
 
 // #013d2e

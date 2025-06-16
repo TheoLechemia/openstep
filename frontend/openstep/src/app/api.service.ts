@@ -11,7 +11,7 @@ export class ApiService {
   constructor(private _http: HttpClient, public configService: ConfigService) { }
 
   getTravels(): Observable<any> {    
-    return this._http.get<any>(`${this.configService.config.API_ENDPOINT}/travels`).pipe(
+    return this._http.get<any>(`${this.configService.config.API_ENDPOINT}/travels/`).pipe(
       map(resp => {
         return resp["results"]
       })
@@ -19,16 +19,14 @@ export class ApiService {
   }
 
   getTravel(idTravel:number): Observable<any> {
-    return this._http.get<any>(`${this.configService.config.API_ENDPOINT}/travels/${idTravel}`)
+    return this._http.get<any>(`${this.configService.config.API_ENDPOINT}/travels/${idTravel}/`)
   }
 
   getStep(idStep:number): Observable<any> {
-    return this._http.get<any>(`${this.configService.config.API_ENDPOINT}/steps/${idStep}`)
+    return this._http.get<any>(`${this.configService.config.API_ENDPOINT}/steps/${idStep}/`)
   }
 
   postComment(data: any): Observable<any> {
-    console.log("donc data", data);
-    
     return this._http.post<any>(
       `${this.configService.config.API_ENDPOINT}/comments/`, data)
   }

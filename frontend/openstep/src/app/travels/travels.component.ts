@@ -4,18 +4,19 @@ import { RouterLink, RouterLinkActive, RouterModule, RouterOutlet } from '@angul
 
 import { ApiService } from '../api.service';
 import { MapService } from '../map.service';
+import { TravelService } from '../travel.service';
 @Component({
   selector: 'app-travels',
   standalone: true,
   imports: [MapComponent, RouterLink, RouterOutlet],
   templateUrl: './travels.component.html',
   styleUrl: './travels.component.scss',
-  providers: [MapService]
+  providers: [MapService, TravelService]
 })
 export class TravelsComponent implements OnInit {
   public travels: Array<any> = [];
   public geojson:any;
-  constructor(private _api: ApiService, private _mapService: MapService) {}
+  constructor(private _api: ApiService, private _mapService: MapService, private stepsserv: TravelService) {}
 
   ngOnInit(): void {
     this._api.getTravels().subscribe((travels: Array<any>) => {

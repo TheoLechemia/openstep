@@ -1,9 +1,12 @@
-import { Component, Input, inject, TemplateRef } from '@angular/core';
+import { Component, Input, inject, CUSTOM_ELEMENTS_SCHEMA, AfterViewInit, ContentChild, ElementRef, ViewChildren, QueryList, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 
 import { MatIcon } from '@angular/material/icon';
-import {  DatePipe } from '@angular/common';
+import {  CommonModule, DatePipe } from '@angular/common';
 import * as L from "leaflet" 
+import { LightboxModule } from 'ngx-lightbox';
+import { Lightbox } from 'ngx-lightbox';
+
 
 import {
   MatDialog,
@@ -13,49 +16,203 @@ import { ApiService } from '../api.service';
 import { MapComponent } from '../map/map.component';
 import { MapService } from '../map.service';
 import { MatDivider } from '@angular/material/divider';
-import { RouterLink} from '@angular/router';
+import { ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {MatFormFieldModule, MatSuffix} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
 import {MatListModule} from '@angular/material/list';
 import { FormsModule } from '@angular/forms';
+import { TravelService } from '../travel.service';
+import { filter } from 'rxjs';
+import { SwiperContainer } from 'swiper/element';
+import { Swiper } from 'swiper/types';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+
+
 
 
 @Component({
   selector: 'app-step-detail',
   standalone: true,
-  imports: [RouterLink, DatePipe, FormsModule, MatSuffix, MatInputModule,MatListModule, MatFormFieldModule, MapComponent, MatDivider, CarouselModule, MatButtonModule, DatePipe,  MatIcon],
+  imports: [RouterLink, DatePipe, FormsModule, MatSuffix, MatInputModule,MatListModule, MatFormFieldModule, MapComponent, MatDivider, CarouselModule, LightboxModule, MatButtonModule, DatePipe,  MatIcon, CommonModule, MatProgressSpinnerModule],
   templateUrl: './step-detail.component.html',
   styleUrl: './step-detail.component.scss',
-  providers: [MapService]
+  providers: [MapService],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
+
 })
-export class StepDetailComponent  {
-  constructor(private _api: ApiService) {}
-  public step:any;
+export class StepDetailComponent implements AfterViewInit  {
+  constructor(private _api: ApiService, private _router: Router,   private _route: ActivatedRoute, private _lightbox: Lightbox, private _mapService: MapService,  public travelService: TravelService, private _cd: ChangeDetectorRef) {}
+  public steps: Array<any> = [];
+  public step: any;
+  public idStep_: number;
+  public idTravel: number;
+  public currentIdtravel: number;
   readonly dialog = inject(MatDialog);
-
-
-  comments = [
-    {"message" : "ah oausi de ouf", "date": "01/01/2022"},
-    {"message" : "MAIS NAN", "date": "01/01/2022"},
-    {"message" : "SI SI", "date": "01/01/2022"},
-  ]
   public commentMessage: string;
-  @Input()
-  set id(idStep: number) {
-    this._api.getStep(idStep).subscribe(step => this.step = step);
+  public stepIndexInTravel: number;
+  @ViewChild('swiperRef')
+  swiperRef: ElementRef | undefined;
+  swiper?: Swiper;
+
+  ngAfterViewInit(): void {    
+
+    // interact('#rotate-area').gesturable({
+    //   onmove: function (event) {
+    //     var arrow = document.getElementById('arrow')
+    
+    //     angle += event.da
+    
+    //     arrow.style.webkitTransform =
+    //     arrow.style.transform =
+    //       'rotate(' + angle + 'deg)'
+    
+    //     document.getElementById('angle-info').textContent =
+    //       angle.toFixed(2) + '\u00b0'
+    //   },
+    // })
+    // const position = { x: 0, y: 0 }
+
+    // let angle = 0
+    // interact('#main').draggable({
+    //     startAxis: 'x',
+    //     lockAxis: 'x',
+    //   listeners: {
+    //     start (event) {
+    //       // console.log(event.type, event.target)
+    //     },
+    //     move (event) {
+    //       console.log("mooove", event);
+          
+    //       position.x += event.dx
+    //       position.y += event.dy
+    
+    //       // event.target.style.transform =
+    //       //   `translate(${position.x}px, ${position.y}px)`
+    //     },
+
+    //     end(event) {
+    //       console.log("end", event);
+          
+    //     }
+    //   }
+    // })
+
+
+    // addEventListener("touchstart", (event) => {
+
+    //   console.log(event);
+      
+    // });
+
+    // addEventListener("touchmove", (event) => {
+
+    //   console.log(event);
+      
+    // });
+
+    // addEventListener("touchend", (event) => {
+
+    //   console.log("enddd", event);
+    //   console.log(event.changedTouches[0].pageX);
+      
+      
+    // });
+
+
+    // document.addEventListener('swiped', (e:any) => {
+      
+    //   if(e.detail.dir == 'right') {
+    //     const swipe = document.getElementById("left-swipper");
+    //     swipe.style.display = "block"
+    //     setTimeout(() => {
+    //       this.previousStep();
+    //     }, 200);
+    //   }
+    //   if(e.detail.dir == "left") {
+    //     this.nextStep();
+    //   }
+    // });
+
+    this._route.params.subscribe(route => {
+      const currentIdTravel = parseInt(route["idTravel"]);
+      // TODO : ne pas recharger le travel à chaque fois !!
+      this.step = null;
+      const swipe = document.getElementById("left-swipper");
+      swipe.style.display = "none"
+      this.idTravel = currentIdTravel;
+      this.idStep_ =  parseInt(route["idStep"]);
+      if(this.travelService.travel && this.travelService.travel.id == currentIdTravel) {
+        this.setStepsAndStep(this.travelService.travel, this.idStep_)
+      }
+      if(this.travelService.travel && this.travelService.travel.id != currentIdTravel) {
+        console.log("c'est pas le meme !");
+          this._api.getTravel(currentIdTravel).subscribe(travel => {
+          this.travelService.setTravel(travel);
+          this.setStepsAndStep(travel, this.idStep_)
+        });    
+      }
+      if(!this.travelService.travel) {
+        this._api.getTravel(currentIdTravel).subscribe(travel => {
+          this.travelService.setTravel(travel);
+          this.setStepsAndStep(travel, this.idStep_)
+        });      
+
+      }
+    })
+  }
+
+  zoomOnLayer() {  
+    // Moche mais trouve pas comment faire d'autre      
+    setTimeout(()=> {          
+          this._mapService.zoomOnLayer(this.idStep_, 15);
+
+      }, 200)
+  }
+
+  setStepsAndStep(travel, idStep) {
+      this.stepIndexInTravel = travel.steps.features.map(step => step.id).indexOf(idStep) | 0;
+      this.steps = travel.steps.features;
+      this.step = travel.steps.features.find(step => {
+        return step.id == idStep
+      });
+      
+      this._mapService.displayTravelLine(travel.steps);
+
+      setTimeout(()=> {
+    // Moche mais trouve pas comment faire d'autre      
+          
+          this._mapService.zoomOnLayer(this.idStep_, 15);
+
+      }, 200)
+  }
+
+  open(index) {
+    this._lightbox.open(this.step.properties.medias, index);
   }
 
 
-  pointToLayer(feature, latLng) {    
-    let icon = L.divIcon({
-      html:`<div class="observation-marker-container ${feature.properties.isLastStep ? "last-step": ""}">
-          </div>
-        </div>`,
-      className: 'observation-marker',
-      iconSize: 32,
-      iconAnchor: [18, 28],
-    } as any);
-    return L.marker(latLng, {icon: icon});
+  nextStep() {    
+    const nextIndex = this.stepIndexInTravel + 1;
+    console.log(nextIndex);
+    
+    if(nextIndex == this.steps.length) {
+      console.log("last step");
+      
+    } else {
+      const nextIdStep = this.steps[nextIndex].id;
+      this._router.navigate(["travel", this.idTravel, "step", nextIdStep])
+    }
+  }
+
+  previousStep() {
+    const previousIndex = this.stepIndexInTravel - 1;
+    
+    if(previousIndex < 0) {
+      
+    } else {      
+      const previousIdStep = this.steps[previousIndex].id;
+      this._router.navigate(["travel", this.idTravel, "step", previousIdStep])
+    }
   }
 
   addComment(){    
@@ -69,3 +226,36 @@ export class StepDetailComponent  {
   }
 
 }
+
+
+
+
+        // let swippperStartIndex = 
+        // console.log(swippperStartIndex);
+        
+        // const swiperEl = document.querySelector('swiper-container');
+        // const swiperParams = {
+        //   slidesPerView: 1,
+        //   pagination: true,
+        //   initialSlide: swippperStartIndex,
+        // };
+    
+        // Object.assign(swiperEl, swiperParams);
+    
+        // // and now initialize it
+        // swiperEl.initialize();
+        // this.swiper = this.swiperRef?.nativeElement.swiper;
+        // var t = document.getElementById("lala"); t
+        // swiperEl.addEventListener('swiperslidechange', (event) => {
+        //   // pas moyen d'avoir le "activeSlide" via l'API et sans timeout on 
+        //   // retrouve la slide d'avant...
+        //   setTimeout(() => {
+        //     // on doit remetre la 
+        //     swiperEl.style.height = "auto"
+        //     const activeSlide = document.getElementsByClassName("swiper-slide-active")[0];
+        //     const currentHeight = (activeSlide as HTMLElement).offsetHeight;
+        //     // très moche
+        //     swiperEl.style.height =  currentHeight.toString()+"px";
+        //   }, 200);        
+        //   this._mapService.zoomOnLayer(this.steps[this.swiper.activeIndex].id);
+        // });      

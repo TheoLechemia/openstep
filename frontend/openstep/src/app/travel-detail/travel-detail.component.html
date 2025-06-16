@@ -14,13 +14,13 @@
             </div>
         </mat-card>
     </div>
-      <app-map [geojson]="travel.steps" [pointToLayer]="pointToLayer.bind(this)"  ></app-map>
+      <app-map [geojson]="steps" [pointToLayer]="pointToLayer.bind(this)"  ></app-map>
 
 </div>
 
 
 
-
+<!-- 
 <div id="caroussel-container" class="cover caroussel-block mt-2">
         <button (click)="moove(-400)" class="left"  mat-mini-fab>
             <mat-icon>chevron_left</mat-icon>
@@ -62,5 +62,51 @@
         <button (click)="moove(400)" class="right"  mat-mini-fab>
             <mat-icon>chevron_right</mat-icon>
         </button>
-</div>
+</div> -->
     
+
+  <swiper-container 
+    init="false"
+    id="caroussel-container" 
+    class="mySwiper" 
+    >
+
+    @for (step of nonPositionelSteps; track step.id) {
+        <swiper-slide class="height-100 ">
+            <mat-card class="step-card height-100 width-100">
+                <img class="step-img" (click)="goToDetail(step.id)" #img mat-card-image src="{{step.properties.first_media?.src}}" alt="">
+                <div class="float-info">
+                    <div (click)="goToDetail(step.id)"  class="info-overlay">
+                        <h4> {{step.properties.name}} </h4>
+                        <span> {{step.properties.country}}  </span>
+
+                    </div>
+                </div>
+
+                <mat-card-actions>
+                    <span id="nb-comments" class="me-4 size">
+                        <mat-icon [inline]="true">chat</mat-icon> <span class="text-muted"> {{step.properties.comments.length}} </span> 
+                    </span>
+                    <span id="nb-photos" class="me-4 size">
+                        <mat-icon [inline]="true" >photo_camera</mat-icon> <span class="text-muted"> {{step.properties.medias.length}} </span> 
+                    </span>
+                    <span class="me-4 size">
+                        <mat-icon [inline]="true" >calendar_month</mat-icon> <span class="text-muted"> {{step.properties.date  |date: 'dd MMM yyyy' }} </span> 
+                    </span>
+
+                    <button (click)="mapService.zoomOnLayer(step.id)" mat-mini-fab class="" >
+                        <mat-icon  >map</mat-icon>
+                    </button>
+                    <button style="display: none;"  mat-flat-button>  test</button>
+                </mat-card-actions>
+                    
+            </mat-card>
+        </swiper-slide>
+    }
+
+
+</swiper-container>
+
+
+<div>
+

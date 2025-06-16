@@ -12,9 +12,12 @@ class CommentSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 class MediaSerializer(serializers.ModelSerializer):
+    caption = serializers.CharField(source="legend")
+    src = serializers.ImageField(source="media_file")
+    thumb = serializers.ImageField(source="media_file")
     class Meta:
         model = Media
-        fields = ('id', 'legend','media_file',)
+        fields = ('id','src', "thumb", "caption")
 
 class TravelSerializerNoStep(serializers.ModelSerializer):
     class Meta:
@@ -30,7 +33,7 @@ class StepSerializer(gis_serializers.GeoFeatureModelSerializer):
     class Meta:
         model = Step
         fields = (
-            'travel', 'comments', 'id', 'name', 'location', 'description', 'date', 'medias', 'first_media', 'day_of_travel', "country", "state")
+            'travel', 'positional_step', 'comments', 'id', 'name', 'location', 'description', 'date', 'medias', 'first_media', 'day_of_travel', "country", "state")
         geo_field = "location"
 
 
