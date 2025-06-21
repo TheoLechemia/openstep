@@ -30,10 +30,10 @@
                             <h3 > {{step.properties.name}}  </h3>
 
 
-                            <button (click)="previousStep()" class="left btn-steps"  mat-mini-fab>
+                            <button (click)="previousStep()" [disabled]="stepIndexInTravel == 0" class="left btn-steps"  mat-mini-fab>
                                 <mat-icon>chevron_left</mat-icon>
                             </button>
-                            <button (click)="nextStep()"  class="right btn-steps"  mat-mini-fab>
+                            <button (click)="nextStep()" [disabled]="stepIndexInTravel == steps.length -1"  class="right btn-steps"  mat-mini-fab>
                                 <mat-icon>chevron_right</mat-icon>
                             </button>
                             <div class="icon-text mb-2">
