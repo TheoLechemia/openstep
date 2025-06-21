@@ -192,27 +192,40 @@ export class StepDetailComponent implements AfterViewInit  {
 
 
   nextStep() {    
-    const nextIndex = this.stepIndexInTravel + 1;
-    console.log(nextIndex);
+    let nextIndex = this.stepIndexInTravel + 1;
+    let nextStepIsPositional = true; 
+    while(nextStepIsPositional && nextIndex != this.steps.length) {
+      let nextStep = this.steps[nextIndex];
+      if(nextStep.properties.positional_step) {
+        nextIndex += 1;
+      } else {
+        nextStepIsPositional = false;
+      }
+    }
     
-    if(nextIndex == this.steps.length) {
-      console.log("last step");
-      
-    } else {
+    if(nextIndex != this.steps.length) {
       const nextIdStep = this.steps[nextIndex].id;
-      this._router.navigate(["travel", this.idTravel, "step", nextIdStep])
+      this._router.navigate(["travel", this.idTravel, "step", nextIdStep])      
     }
   }
 
   previousStep() {
-    const previousIndex = this.stepIndexInTravel - 1;
+    let previousIndex = this.stepIndexInTravel - 1;
+    let previousStepIsPositional = true; 
+    while(previousStepIsPositional && previousIndex >= 0) {
+      let previousStep = this.steps[previousIndex];
+      if(previousStep.properties.positional_step) {
+        previousIndex -= 1;
+      } else {
+        previousStepIsPositional = false;
+      }
+    }
     
-    if(previousIndex < 0) {
-      
-    } else {      
+    if(previousIndex >= 0) {
       const previousIdStep = this.steps[previousIndex].id;
       this._router.navigate(["travel", this.idTravel, "step", previousIdStep])
-    }
+    };
+      
   }
 
   addComment(){    

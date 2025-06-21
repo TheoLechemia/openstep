@@ -94,6 +94,8 @@ export class TravelDetailComponent implements AfterViewInit {
   }
 
   generatePopup(feature) {
+    console.log(this.travel);
+    
     const hasMedias = feature.properties.medias.length > 0;    
     let firstMedia = null;
     let stepDay =  new Date(feature.properties.date);
@@ -112,7 +114,7 @@ export class TravelDetailComponent implements AfterViewInit {
 
               </div>
               <div class="button-see-step">
-              <a href="./#/step/${feature.id}" > 
+              <a href="./#/travel/${this.travel.id}/step/${feature.id}" > 
               <button class="mdc-button mdc-button--unelevated mat-mdc-unelevated-button mat-unthemed mat-mdc-button-base" > See this step</button>
               </a>
               </div>

@@ -32,6 +32,7 @@ export class TravelsComponent implements OnInit {
       });
       this.geojson = generatedGeojson;
       
+      
     })
   }
 
