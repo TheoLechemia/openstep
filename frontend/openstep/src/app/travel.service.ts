@@ -6,20 +6,21 @@ import { BehaviorSubject, Observable } from 'rxjs';
 })
 export class TravelService {
   public currentTravelId: number;
-  public stepsObservable = new BehaviorSubject(null);;
+  public travelObservable = new BehaviorSubject(null);;
   constructor() { 
     
   }
 
   setTravel(travel) {
-    this.stepsObservable.next(travel)
+    this.travelObservable.next(travel);    
+    this.currentTravelId = travel.id;
   }
 
   get travel() {
-    return this.stepsObservable.getValue();
+    return this.travelObservable.getValue();
   }
 
   get travel$(): BehaviorSubject<any> {
-    return this.stepsObservable;
+    return this.travelObservable;
   }
 }

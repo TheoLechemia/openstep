@@ -33,27 +33,25 @@ export class TravelDetailComponent implements AfterViewInit {
   public nonPositionelSteps = []
   public steps: Array<any>;
   @Input()
-  set id(idTravel: number) {
+  set id(idTravel: number) {    
     // load travel and store it in travel service
     // it avoid loading it on each initinialization
-    if (!this.id || this.id != this.travelService.currentTravelId) {
+    if (idTravel != this.travelService.currentTravelId) {
       this._api.getTravel(idTravel).subscribe(travel => {
-        this.travelService.currentTravelId = travel.id;
         this.travelService.setTravel(travel)
       });
     }  
   }
 
   ngAfterViewInit (): void {
-    // this.travelService.stepsObservable.
     this.travelService.travel$.pipe(
       filter(travel => travel != null)
     ).subscribe(travel => {
-      
+      this.nonPositionelSteps = [];
       this.steps = travel.steps.features;
       travel.steps.features.forEach((step: any, index) => {
         if(!step.properties.positional_step) {
-          this.nonPositionelSteps.push(step)
+          this.nonPositionelSteps.push(step);
         }
         step.properties.isLastStep = index == travel.steps.features.length -1
       });
@@ -93,17 +91,15 @@ export class TravelDetailComponent implements AfterViewInit {
     this._router.navigate(["travel", this.travel.id, "step", idStep])
   }
 
-  generatePopup(feature) {
-    console.log(this.travel);
-    
+  generatePopup(feature) {    
     const hasMedias = feature.properties.medias.length > 0;    
     let firstMedia = null;
     let stepDay =  new Date(feature.properties.date);
     let now = new Date();
     let differenceInTime = now.getTime() - stepDay.getTime();
     let diffenreceInDay = Math.round(differenceInTime / (1000 * 3600 * 24));
-    if(hasMedias) {
-      firstMedia = feature.properties.medias[0].media_file
+    if(hasMedias) {      
+      firstMedia = feature.properties.first_media.thumb;
     }    
     return `
           <div class="img-container" style="background-image: url(${firstMedia});">

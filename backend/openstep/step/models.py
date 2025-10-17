@@ -1,7 +1,8 @@
-from datetime import datetime
+from datetime import datetime, time
 from typing import Any, Iterable
 from django.contrib.gis.db import models
 from django.contrib.auth.models import User
+from django.db.models import DateTimeField
 from django.utils.translation import gettext_lazy as _
 from django.utils.timezone import now
 
@@ -39,9 +40,14 @@ class Travel(models.Model):
         return self.name
 
 
+#HACK to have 
+class DateTimeWithoutTZField(DateTimeField):
+    def db_type(self, connection):
+        return 'timestamp'
+    
 class Step(models.Model):
     name = models.CharField(null=True)
-    date = models.DateField()
+    date = DateTimeWithoutTZField()
     positional_step = models.BooleanField(null=False, default=False, verbose_name=_("Positional step"))
     location = models.PointField(srid=4326, verbose_name=_("Location"))
     country = models.CharField(null=True, blank=True)
@@ -56,7 +62,7 @@ class Step(models.Model):
     @property
     def day_of_travel(self)->int:
         """Return the day nunmber of travel of this step"""
-        delta = self.date - self.travel.start_date
+        delta = self.date - datetime.combine(self.travel.start_date, time())
         return delta.days
 
     def save(self, *args, **kwargs):

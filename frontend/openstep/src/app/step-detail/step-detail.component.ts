@@ -239,36 +239,3 @@ export class StepDetailComponent implements AfterViewInit  {
   }
 
 }
-
-
-
-
-        // let swippperStartIndex = 
-        // console.log(swippperStartIndex);
-        
-        // const swiperEl = document.querySelector('swiper-container');
-        // const swiperParams = {
-        //   slidesPerView: 1,
-        //   pagination: true,
-        //   initialSlide: swippperStartIndex,
-        // };
-    
-        // Object.assign(swiperEl, swiperParams);
-    
-        // // and now initialize it
-        // swiperEl.initialize();
-        // this.swiper = this.swiperRef?.nativeElement.swiper;
-        // var t = document.getElementById("lala"); t
-        // swiperEl.addEventListener('swiperslidechange', (event) => {
-        //   // pas moyen d'avoir le "activeSlide" via l'API et sans timeout on 
-        //   // retrouve la slide d'avant...
-        //   setTimeout(() => {
-        //     // on doit remetre la 
-        //     swiperEl.style.height = "auto"
-        //     const activeSlide = document.getElementsByClassName("swiper-slide-active")[0];
-        //     const currentHeight = (activeSlide as HTMLElement).offsetHeight;
-        //     // très moche
-        //     swiperEl.style.height =  currentHeight.toString()+"px";
-        //   }, 200);        
-        //   this._mapService.zoomOnLayer(this.steps[this.swiper.activeIndex].id);
-        // });      
