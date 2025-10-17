@@ -102,6 +102,8 @@ class Media(models.Model):
         on_delete=models.CASCADE, 
         related_name="medias",
     )
+    class Meta:
+        ordering = ["id"]
 
 
 class Comments(models.Model):
