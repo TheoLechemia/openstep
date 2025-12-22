@@ -5,3 +5,10 @@ markdown
 django-filter
 djangorestframework-gis
 geopy
+psycopg2
+corsheaders
+django-cors-headers
+django-resized
+pillow
+staticmap
+django-weasyprint

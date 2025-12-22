@@ -48,6 +48,23 @@ Install backend dependencies:
     source venv/bin/activate
     pip install requirements.in
 
+Create an fill the config file
+
+    cd openstep
+    cp config.py.sample config.py
+
+Create a PostGIS database
+
+    sudo su postgres
+    psql
+    create database mydb owner myuser
+    \c mydb
+    CREATE EXTENSION postgis;
+
+Create the database structre
+
+    python manage.py migrate
+
 Run dev server: 
 
     python manage.py runserver

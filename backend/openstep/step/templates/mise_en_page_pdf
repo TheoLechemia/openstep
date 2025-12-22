@@ -1,0 +1,624 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ step.name }} - Photos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2C3E50;
+            --accent-color: #E8B4B8;
+            --text-color: #4A4A4A;
+            --light-bg: #FAF9F6;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Lato', sans-serif;
+            background-color: #666;
+            color: var(--text-color);
+            line-height: 1.7;
+            padding: 40px 20px;
+        }
+
+        /* Canvas A4 en paysage */
+        .a4-canvas {
+            width: 297mm;  /* Largeur A4 paysage */
+            height: 210mm; /* Hauteur A4 paysage */
+            background: white;
+            margin: 0 auto 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Zone de dépassement visible */
+        .a4-canvas::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border: 3px dashed #ff4444;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .a4-canvas.overflow::after {
+            opacity: 1;
+        }
+
+        /* Indicateur de dépassement */
+        .overflow-indicator {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: #ff4444;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+            display: none;
+            z-index: 1001;
+            animation: pulse 1s infinite;
+        }
+
+        .overflow-indicator.show {
+            display: block;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        h1, h2, h3 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 600;
+        }
+        
+        /* Hero Photo Section */
+        .page-container {
+            max-width: 100%;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .main-photo-frame {
+            background: white;
+            padding: 10px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.15);
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        /* Interact.js: Classes pour drag & resize */
+        .draggable {
+            touch-action: none;
+            user-select: none;
+            cursor: move;
+        }
+
+        .draggable.dragging {
+            opacity: 0.8;
+            z-index: 1000;
+        }
+
+        .resizable {
+            position: relative;
+        }
+
+        .resize-handle {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: var(--accent-color);
+            border: 2px solid white;
+            border-radius: 50%;
+            bottom: -10px;
+            right: -10px;
+            cursor: nwse-resize;
+            z-index: 10;
+            display: none;
+        }
+
+        .resizable:hover .resize-handle,
+        .resizable.resizing .resize-handle {
+            display: block;
+        }
+
+        .pdf-border-img {
+            border: solid 1px #0000002c;
+            border-radius: 5px;
+        }
+
+        .main-photo-frame img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        .hero-info {
+            text-align: center;
+            margin-top: 35px;
+        }
+
+        .hero-info h1 {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+
+        .hero-info .date-location {
+            font-size: 1.1rem;
+            color: var(--text-color);
+            margin-bottom: 15px;
+        }
+
+        .hero-legend {
+            margin-top: 15px;
+            font-style: italic;
+            font-size: 1rem;
+            color: #888;
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* Gallery Section */
+        .gallery-section {
+            padding: 20px;
+            position: relative;
+        }
+
+        .photo-frame {
+            background: white;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+            height: 100%;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .photo-frame:hover {
+            box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+        }
+
+        .photo-frame img {
+            width: 100%;
+            display: block;
+            pointer-events: none;
+        }
+
+        .photo-caption {
+            text-align: center;
+            font-style: italic;
+            color: #888;
+            font-size: 0.9rem;
+            margin-top: 12px;
+            font-family: 'Playfair Display', serif;
+        }
+        
+        .photo-item {
+            height: 100%;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        /* Rotation subtile pour effet naturel */
+        .photo-item:nth-child(1) .photo-frame {
+            transform: rotate(-1.5deg);
+        }
+
+        .photo-item:nth-child(2) .photo-frame {
+            transform: rotate(1deg);
+        }
+
+        .photo-item:nth-child(3) .photo-frame {
+            transform: rotate(-0.5deg);
+        }
+
+        .photo-item:nth-child(4) .photo-frame {
+            transform: rotate(1.5deg);
+        }
+
+        .photo-item:nth-child(5) .photo-frame {
+            transform: rotate(-1deg);
+        }
+
+        /* Divider */
+        .divider {
+            text-align: center;
+            margin: 50px 0;
+        }
+
+        .divider-line {
+            display: inline-block;
+            width: 80px;
+            height: 1px;
+            background: var(--accent-color);
+        }
+
+        .divider-dot {
+            display: inline-block;
+            width: 5px;
+            height: 5px;
+            background: var(--accent-color);
+            border-radius: 50%;
+            margin: 0 18px;
+            vertical-align: middle;
+        }
+
+        .row-gallery {
+            align-items: center;
+        }
+
+        /* Toolbar pour les contrôles */
+        .edit-toolbar {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+            z-index: 1000;
+            max-width: 250px;
+        }
+
+        .edit-toolbar button {
+            margin: 5px;
+            width: calc(100% - 10px);
+        }
+
+        .edit-mode-badge {
+            display: inline-block;
+            background: var(--accent-color);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .page-counter {
+            background: #f0f0f0;
+            padding: 8px;
+            border-radius: 5px;
+            text-align: center;
+            margin-top: 10px;
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        /* Print optimization */
+        @media print {
+            @page {
+                size: A4;
+                margin: 0.2cm;
+                size: landscape
+            }
+
+            .edit-toolbar {
+                display: none !important;
+            }
+
+            .resize-handle {
+                display: none !important;
+            }
+
+            .photo-item .photo-frame {
+                transform: rotate(0deg) !important;
+                page-break-inside: avoid;
+            }
+
+            .photo-item {
+                page-break-inside: avoid;
+                page-break-after: auto;
+            }
+
+            .row-gallery {
+                align-items: center !important;
+                min-height: auto;
+            }
+
+            .hero-container,
+            .gallery-section .container {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Indicateur de dépassement -->
+    <div class="overflow-indicator" id="overflowIndicator">
+        ⚠️ Élément(s) en dehors de la page !
+    </div>
+
+    <!-- Toolbar d'édition -->
+    <div class="edit-toolbar">
+        <div class="edit-mode-badge">Mode Édition</div>
+        <div>
+            <button class="btn btn-sm btn-primary" id="toggleEdit">
+                <i class="bi bi-pencil"></i> Éditer
+            </button>
+            <button class="btn btn-sm btn-success" id="saveLayout">
+                <i class="bi bi-save"></i> Sauvegarder
+            </button>
+            <button class="btn btn-sm btn-secondary" id="resetLayout">
+                <i class="bi bi-arrow-clockwise"></i> Réinitialiser
+            </button>
+        </div>
+        <div class="page-counter">
+            Page <span id="currentPage">1</span> / <span id="totalPages">1</span>
+        </div>
+    </div>
+
+    {% if step.first_media %}
+    
+    <!-- Page A4 paysage - Photo principale -->
+    <div class="a4-canvas" data-page="1">
+        <div class="page-container">
+            <div class="main-photo-frame pdf-border-img draggable resizable" data-x="0" data-y="0">
+                <img src="{{ step.first_media.media_file.url }}" alt="{{ step.first_media.legend|default:'Photo principale' }}">
+                <div class="resize-handle"></div>
+            </div>
+        </div>
+    </div>
+
+    {% if step.medias.all|length > 1 %}
+
+    <!-- Page A4 paysage - Galerie des autres photos -->
+    <div class="a4-canvas" data-page="2">
+        <div class="gallery-section">
+            <div class="container">
+                <div class="row g-4 row-gallery">
+                    {% for media in media_with_cols %}
+                            <div class="photo-item col-{{media.col_size}} draggable" data-x="0" data-y="0">
+                                <div class="photo-frame {{ media.orientation }} pdf-border-img resizable">
+                                    <img src="{{ media.media.media_file.url }}" alt="{{ media.media.legend|default:'Photo de voyage' }}">
+                                    <div class="resize-handle"></div>
+                                </div>
+                                {% if media.legend %}
+                                <div class="photo-caption">{{ media.legend }}</div>
+                                {% endif %}
+                            </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <!-- Pas de photos -->
+    <div class="a4-canvas" data-page="1">
+        <div class="page-container">
+            <div class="hero-info" style="padding: 100px 20px;">
+                <h1>{{ step.name|default:"Sans titre" }}</h1>
+                <div class="date-location">{{ step.date|date:"d F Y" }}</div>
+                <p style="margin-top: 30px; color: #999;">Aucune photo disponible pour cette étape</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/interactjs@1.10.19/dist/interact.min.js"></script>
+    
+    <script>
+        let editMode = false;
+
+        // Compter les pages
+        const totalPages = document.querySelectorAll('.a4-canvas').length;
+        document.getElementById('totalPages').textContent = totalPages;
+
+        // Fonction pour vérifier les dépassements
+        function checkOverflow() {
+            let hasOverflow = false;
+            
+            document.querySelectorAll('.a4-canvas').forEach(canvas => {
+                const canvasRect = canvas.getBoundingClientRect();
+                const elements = canvas.querySelectorAll('.draggable, .resizable');
+                
+                let pageHasOverflow = false;
+                elements.forEach(el => {
+                    const elRect = el.getBoundingClientRect();
+                    
+                    // Vérifier si l'élément dépasse du canvas
+                    if (elRect.left < canvasRect.left || 
+                        elRect.right > canvasRect.right || 
+                        elRect.top < canvasRect.top || 
+                        elRect.bottom > canvasRect.bottom) {
+                        hasOverflow = true;
+                        pageHasOverflow = true;
+                        el.style.border = '2px solid #ff4444';
+                    } else {
+                        el.style.border = '';
+                    }
+                });
+                
+                if (pageHasOverflow) {
+                    canvas.classList.add('overflow');
+                } else {
+                    canvas.classList.remove('overflow');
+                }
+            });
+            
+            // Afficher/masquer l'indicateur
+            const indicator = document.getElementById('overflowIndicator');
+            if (hasOverflow) {
+                indicator.classList.add('show');
+            } else {
+                indicator.classList.remove('show');
+            }
+        }
+
+        // Toggle edit mode
+        document.getElementById('toggleEdit').addEventListener('click', function() {
+            editMode = !editMode;
+            document.body.style.cursor = editMode ? 'default' : 'default';
+            this.innerHTML = editMode 
+                ? '<i class="bi bi-lock"></i> Verrouiller' 
+                : '<i class="bi bi-pencil"></i> Éditer';
+            this.classList.toggle('btn-primary');
+            this.classList.toggle('btn-warning');
+            
+            if (!editMode) {
+                checkOverflow();
+            }
+        });
+
+        // Fonction pour déplacer les éléments
+        function dragMoveListener(event) {
+            if (!editMode) return;
+            
+            const target = event.target;
+            const x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
+            const y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+
+            target.style.transform = `translate(${x}px, ${y}px)`;
+            target.setAttribute('data-x', x);
+            target.setAttribute('data-y', y);
+            
+            checkOverflow();
+        }
+
+        // Configuration Interact.js pour le drag
+        interact('.draggable')
+            .draggable({
+                listeners: { move: dragMoveListener },
+                onstart: function(event) {
+                    if (!editMode) {
+                        event.interaction.stop();
+                        return;
+                    }
+                    event.target.classList.add('dragging');
+                },
+                onend: function(event) {
+                    event.target.classList.remove('dragging');
+                    checkOverflow();
+                }
+            });
+
+        // Configuration Interact.js pour le resize
+        interact('.resizable')
+            .resizable({
+                edges: { right: '.resize-handle', bottom: '.resize-handle' },
+                listeners: {
+                    move(event) {
+                        if (!editMode) return;
+                        
+                        const target = event.target;
+                        let x = (parseFloat(target.getAttribute('data-x')) || 0);
+                        let y = (parseFloat(target.getAttribute('data-y')) || 0);
+
+                        target.style.width = event.rect.width + 'px';
+                        target.style.height = event.rect.height + 'px';
+
+                        x += event.deltaRect.left;
+                        y += event.deltaRect.top;
+
+                        target.style.transform = `translate(${x}px, ${y}px)`;
+                        target.setAttribute('data-x', x);
+                        target.setAttribute('data-y', y);
+                        
+                        checkOverflow();
+                    }
+                },
+                modifiers: [
+                    interact.modifiers.restrictSize({
+                        min: { width: 100, height: 100 }
+                    })
+                ],
+                onstart: function(event) {
+                    if (!editMode) {
+                        event.interaction.stop();
+                        return;
+                    }
+                    event.target.classList.add('resizing');
+                },
+                onend: function(event) {
+                    event.target.classList.remove('resizing');
+                    checkOverflow();
+                }
+            });
+
+        // Sauvegarder la mise en page
+        document.getElementById('saveLayout').addEventListener('click', function() {
+            const layout = [];
+            
+            document.querySelectorAll('.draggable, .resizable').forEach(el => {
+                layout.push({
+                    selector: el.className,
+                    x: el.getAttribute('data-x'),
+                    y: el.getAttribute('data-y'),
+                    width: el.style.width,
+                    height: el.style.height,
+                    transform: el.style.transform
+                });
+            });
+            
+            localStorage.setItem('photoLayout', JSON.stringify(layout));
+            alert('Mise en page sauvegardée !');
+        });
+
+        // Réinitialiser la mise en page
+        document.getElementById('resetLayout').addEventListener('click', function() {
+            if (confirm('Réinitialiser la mise en page ?')) {
+                document.querySelectorAll('.draggable, .resizable').forEach(el => {
+                    el.style.transform = '';
+                    el.style.width = '';
+                    el.style.height = '';
+                    el.style.border = '';
+                    el.setAttribute('data-x', 0);
+                    el.setAttribute('data-y', 0);
+                });
+                document.querySelectorAll('.a4-canvas').forEach(canvas => {
+                    canvas.classList.remove('overflow');
+                });
+                localStorage.removeItem('photoLayout');
+                checkOverflow();
+            }
+        });
+
+        // Détecter le scroll pour afficher la page courante
+        let scrollTimeout;
+        window.addEventListener('scroll', function() {
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(() => {
+                const scrollPos = window.scrollY + window.innerHeight / 2;
+                document.querySelectorAll('.a4-canvas').forEach((canvas, index) => {
+                    const rect = canvas.getBoundingClientRect();
+                    const canvasTop = rect.top + window.scrollY;
+                    const canvasBottom = canvasTop + rect.height;
+                    
+                    if (scrollPos >= canvasTop && scrollPos <= canvasBottom) {
+                        document.getElementById('currentPage').textContent = index + 1;
+                    }
+                });
+            }, 100);
+        });
+
+        // Vérification initiale
+        window.addEventListener('load', function() {
+            checkOverflow();
+        });
+    </script>
+</body>
+</html>

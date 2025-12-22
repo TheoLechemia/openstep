@@ -4,25 +4,42 @@ from rest_framework import routers, serializers, viewsets
 from rest_framework_gis import serializers as gis_serializers
 
 
-from step.models import Step, Travel, Media, Comments
+from step.models import Step, Travel, Media, Comments, BookLayout
+
 
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comments
         fields = "__all__"
 
+
+class BookLayoutSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BookLayout
+        fields = "__all__"
+
+    # def create(self, validated_data):
+    #     return BookLayout.objects.update_or_create(
+    #         step=validated_data["step"],
+    #         defaults={"html": validated_data.get("html", "")},
+    #     )[0]
+
+
 class MediaSerializer(serializers.ModelSerializer):
     caption = serializers.CharField(source="legend")
     src = serializers.ImageField(source="media_file")
     thumb = serializers.ImageField(source="media_file")
+
     class Meta:
         model = Media
-        fields = ('id','src', "thumb", "caption")
+        fields = ("id", "src", "thumb", "caption")
+
 
 class TravelSerializerNoStep(serializers.ModelSerializer):
     class Meta:
         model = Travel
         fields = ["name", "id", "description"]
+
 
 class StepSerializer(gis_serializers.GeoFeatureModelSerializer):
     medias = MediaSerializer(many=True)
@@ -33,42 +50,55 @@ class StepSerializer(gis_serializers.GeoFeatureModelSerializer):
     class Meta:
         model = Step
         fields = (
-            'travel', 'positional_step', 'comments', 'id', 'name', 'location', 'description', 'date', 'medias', 'first_media', 'day_of_travel', "country", "state")
+            "travel",
+            "positional_step",
+            "comments",
+            "id",
+            "name",
+            "location",
+            "description",
+            "date",
+            "medias",
+            "first_media",
+            "day_of_travel",
+            "country",
+            "state",
+        )
         geo_field = "location"
-
 
 
 class TravelSerializer(serializers.ModelSerializer):
     steps = StepSerializer(many=True)
+
     class Meta:
         model = Travel
         fields = "__all__"
 
+
 # StepSerializer._declared_fields["travel"] = TravelSerializer(context={"exclude_fields": ["steps"]})
+
 
 class StepViewSet(viewsets.ModelViewSet):
     serializer_class = StepSerializer
-    queryset = Step.objects.all().prefetch_related("medias").order_by('date')
-    filterset_fields = ['name', 'travel']
+    queryset = Step.objects.all().prefetch_related("medias").order_by("date")
+    filterset_fields = ["name", "travel"]
     page_size = 300
     max_page_size = 500
 
 
-
-    
 class TravelViewSet(viewsets.ModelViewSet):
     queryset = Travel.objects.all().prefetch_related("steps")
     serializer_class = TravelSerializer
 
+
 from rest_framework.response import Response
 from rest_framework import status
+
 
 class CommentiewSet(viewsets.ModelViewSet):
     permission_classes = []
     queryset = Comments.objects.all()
     serializer_class = CommentSerializer
-
-
 
     def post(self, request, format=None):
         serializer = self.serializer_class(data=request.data)
@@ -76,6 +106,37 @@ class CommentiewSet(viewsets.ModelViewSet):
         serializer.error_messages
 
         if serializer.is_valid():
-            return Response(serializer(request.data).data, status=status.HTTP_201_CREATED)
-        
-        return Response({'Bad Request': "Invalid Data..."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                serializer(request.data).data, status=status.HTTP_201_CREATED
+            )
+
+        return Response(
+            {"Bad Request": "Invalid Data..."}, status=status.HTTP_400_BAD_REQUEST
+        )
+
+
+class BookLayoutViewSet(viewsets.ModelViewSet):
+    permission_classes = []
+
+    queryset = BookLayout.objects.all()
+    serializer_class = BookLayoutSerializer
+
+    def create(self, request, *args, **kwargs):
+        step_id = request.data.get("step")
+        html = request.data.get("html", "")
+
+        if not step_id:
+            return Response(
+                {"step": "This field is required."}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        obj, created = BookLayout.objects.update_or_create(
+            step_id=step_id,
+            defaults={"html": html},
+        )
+
+        serializer = self.get_serializer(obj)
+        return Response(
+            serializer.data,
+            status=status.HTTP_201_CREATED if created else status.HTTP_200_OK,
+        )
