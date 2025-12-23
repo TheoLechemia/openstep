@@ -1,7 +1,7 @@
 import random
 
 from django.shortcuts import render
-from .models import Step
+from .models import Step, Travel
 from django_weasyprint.views import WeasyTemplateResponse
 from weasyprint import HTML
 from django.http import HttpResponse
@@ -14,71 +14,76 @@ from staticmap import StaticMap, CircleMarker, Line
 
 
 class StepPdfDescMixin:
-    def get_context_data(self, id):
-        step = get_object_or_404(Step, id=id)
-        context = {"step": step}
+
+    def get_map(self, step):
+        travel_line_coords = [
+            (s.location.x, s.location.y)
+            for s in step.travel.steps.exclude(location__isnull=True)
+        ]
+
         m = StaticMap(
-            width=1200,
-            height=300,
+            width=370,
+            height=793,
             url_template="https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}",
         )
-        coordinates = [step.location.x, step.location.y]
-        marker = CircleMarker(coordinates, "#E8B4B8", 12)
-        marker_outline = CircleMarker(coordinates, "white", 18)
 
-        m.add_marker(marker_outline)
-        m.add_marker(marker)
+        m.add_line(Line(travel_line_coords, "#615A5AA4", 3))
 
-        image = m.render(zoom=12)
+        center = (step.location.x, step.location.y)
+        m.add_marker(CircleMarker(center, "white", 25))
+        m.add_marker(CircleMarker(center, "#E8B4B8", 18))
+
+        image = m.render(zoom=7, center=center)
+
         media_name = f"map_travel_{step.travel.id}_step_{step.id}.png"
         path = settings.MEDIA_ROOT / media_name
         image.save(path)
-        context["map_url"] = settings.MEDIA_URL + media_name
 
+        return settings.MEDIA_URL + media_name
+
+    def get_context_data(self, id):
+        step = get_object_or_404(Step, id=id)
+        context = {"step": step}
+        context["map_url"] = self.get_map(step)
         return context
 
 
 class StepPdfMediaMixin:
-    def get_context_data(self, id):
-        step = get_object_or_404(Step, id=id)
-        context = {"step": step}
-        # Récupérer les médias (sauf le premier qui est l'image principale)
-        medias = list(context["step"].medias.all()[1:7])  # Max 6 images
-
-        # Générer les tailles de colonnes par paires
+    def build_step_medias(self, step):
+        medias = list(step.medias.all()[1:7])
         media_with_cols = []
 
         for i in range(0, len(medias), 2):
-            first_col_size = None
-            # si une des deux paire est en portrait on met la paire à 6/6
             if medias[i].orientation == "portrait" or (
                 i + 1 < len(medias) and medias[i + 1].orientation == "portrait"
             ):
-                first_col_size = 6
-                second_col_size = 6
+                first, second = 6, 6
             else:
-                # Taille aléatoire pour la première colonne (6 et 7)
-                first_col_size = random.choice([5, 6])
-                second_col_size = 11 - first_col_size
-            # if i == len(medias) - 1 and i % 2 == 0:
-            #     first_col_size = 12
-            #     second_col_size = 0
+                first = random.choice([6, 7])
+                second = 12 - first
 
-            # Ajouter le premier média avec sa taille
-            media_with_cols.append({"media": medias[i], "col_size": first_col_size})
+            media_with_cols.append(
+                {
+                    "media": medias[i],
+                    "col_size": first,
+                }
+            )
 
-            # Ajouter le second média si il existe
             if i + 1 < len(medias):
-
                 media_with_cols.append(
-                    {"media": medias[i + 1], "col_size": second_col_size}
+                    {
+                        "media": medias[i + 1],
+                        "col_size": second,
+                    }
                 )
 
-        context["media_with_cols"] = media_with_cols
-        context["has_custom_layout"] = False
-        if hasattr(step, "book_layout"):
-            context["has_custom_layout"] = True
+        return media_with_cols
 
+    def get_context_data(self, id):
+        step = get_object_or_404(Step, id=id)
+        context = {"step": step}
+        context["media_with_cols"] = self.build_step_medias(step)
+        context["has_custom_layout"] = hasattr(step, "book_layout")
         return context
 
 
@@ -88,6 +93,7 @@ class StepDescView(View, StepPdfDescMixin):
 
     def get(self, request, id, *args, **kwargs):
         context = self.get_context_data(id)
+        context["step_page"] = True
         return render(request, self.template_name, context)
 
 
@@ -97,6 +103,7 @@ class StepMediaView(View, StepPdfMediaMixin):
 
     def get(self, request, id, *args, **kwargs):
         context = self.get_context_data(id)
+        context["step_page"] = True
         if context["has_custom_layout"]:
             response = HttpResponse(
                 context["step"].book_layout.html, content_type="text/html"
@@ -132,3 +139,42 @@ class StepExportMediaPDFView(View, StepPdfMediaMixin):
             response["Content-Disposition"] = 'inline; filename="layout.pdf"'
             return response
         return WeasyTemplateResponse(request, self.template_name, context)
+
+
+class TravelExportPDFView(View, StepPdfDescMixin, StepPdfMediaMixin):
+    template_name = "travel_pdf.html"
+
+    def build_step_context(self, step):
+        return {
+            "step": step,
+            # "map_url": None,
+            "map_url": self.get_map(step),
+            "media_with_cols": self.build_step_medias(step),
+            "has_custom_layout": hasattr(step, "book_layout"),
+            "custom_layout_html": (
+                step.book_layout.html if hasattr(step, "book_layout") else None
+            ),
+        }
+
+    def get(self, request, id):
+        steps = (
+            Step.objects.filter(travel_id=id)
+            .filter(positional_step=False)
+            .prefetch_related("medias", "travel__steps")
+            .order_by("date")
+        )
+
+        travel = Travel.objects.get(id=id)
+
+        steps_context = [self.build_step_context(step) for step in steps]
+
+        # return render(
+        #     request, self.template_name, {"steps": steps_context, "travel": travel}
+        # )
+
+        return WeasyTemplateResponse(
+            request,
+            self.template_name,
+            {"steps": steps_context, "travel": travel},
+            filename="travel.pdf",
+        )

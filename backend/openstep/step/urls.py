@@ -16,4 +16,9 @@ urlpatterns = [
         views.StepExportMediaPDFView.as_view(),
         name="step_pdf",
     ),
+    path(
+        "export_travel/<int:id>",
+        views.TravelExportPDFView.as_view(),
+        name="travel_pdf",
+    ),
 ]

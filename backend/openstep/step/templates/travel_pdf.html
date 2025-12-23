@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        @page {
+            size: A4 landscape;
+            margin: 0;
+        }
+
+        .step-desc {
+            break-before: left;
+        }
+
+        .step-media {
+            break-before: right;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="edit-toolbar">
+        <div>
+            <button class="btn btn-sm btn-success" id="saveLayout">
+                <i class="bi bi-save"></i> Sauvegarder
+            </button>
+            <button class="btn btn-sm btn-secondary" id="resetLayout">
+                <i class="bi bi-arrow-clockwise"></i> Réinitialiser
+            </button>
+        </div>
+        <div class="page-counter">
+            Page <span id="currentPage">1</span> / <span id="totalPages">1</span>
+        </div>
+    </div>
+
+{% for s in steps %}
+
+    <section class="step-desc">
+        {% include "step_pdf_description.html" with step=s.step map_url=s.map_url %}
+    </section>
+
+    <section class="step-media">
+        {% include "step_pdf_medias.html" with step=s.step media_with_cols=s.media_with_cols %}
+    </section>
+
+{% endfor %}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/interactjs@1.10.19/dist/interact.min.js"></script>
+    
+<script>
+    document.getElementById('saveLayout').addEventListener('click', function() {
+            const fullDoc = document.getElementsByTagName("html")[0];
+            fetch("http://127.0.0.1:8000/api/book_layout/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": getCookie('csrftoken')
+                },
+                body: JSON.stringify({
+                    "html": fullDoc.innerHTML,
+                    "travel": travelId
+                })
+            });
+
+
+        });
+
+        document.getElementById('resetLayout').addEventListener('click', function() {
+            if (confirm('Réinitialiser la mise en page ?')) {
+  
+            }
+        });
+
+                function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }    
+            return cookieValue;
+        }
+
+        const travelId = {{travel.id}}; 
+        const totalPages = document.querySelectorAll('.a4-canvas').length;
+        document.getElementById('totalPages').textContent = totalPages;
+
+       
+
+        function dragMoveListener(event) {            
+            const target = event.target;
+            const x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
+            const y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+
+            target.style.transform = `translate(${x}px, ${y}px)`;
+            target.setAttribute('data-x', x);
+            target.setAttribute('data-y', y);
+            
+        }
+
+        interact('.draggable').draggable({
+            listeners: { move: dragMoveListener },
+            onstart: function(event) {
+                event.target.classList.add('dragging');
+            },
+            onend: function(event) {
+                event.target.classList.remove('dragging');
+            }
+        });
+
+        interact('.resizable').resizable({
+            edges: { right: true, bottom: true },
+            listeners: {
+                move(event) {
+                    console.log("move");
+                    
+                    const target = event.target;
+                    let x = parseFloat(target.getAttribute('data-x')) || 0;
+                    let y = parseFloat(target.getAttribute('data-y')) || 0;
+
+                    target.style.width = event.rect.width + 'px';
+                    target.style.height = event.rect.height + 'px';
+
+                    x += event.deltaRect.left;
+                    y += event.deltaRect.top;
+
+                    target.style.transform = `translate(${x}px, ${y}px)`;
+                    target.setAttribute('data-x', x);
+                    target.setAttribute('data-y', y);
+                    
+                }
+            },
+            modifiers: [
+                interact.modifiers.restrictSize({
+                    min: { width: 100, height: 100 }
+                })
+            ],
+            onstart: function(event) {
+                console.log("start");
+                event.target.classList.add('resizing');
+            },
+            onend: function(event) {
+                console.log("end");
+                event.target.classList.remove('resizing');
+            }
+        });
+
+        
+
+        let scrollTimeout;
+        window.addEventListener('scroll', function() {
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(() => {
+                const scrollPos = window.scrollY + window.innerHeight / 2;
+                document.querySelectorAll('.a4-canvas').forEach((canvas, index) => {
+                    const rect = canvas.getBoundingClientRect();
+                    const canvasTop = rect.top + window.scrollY;
+                    const canvasBottom = canvasTop + rect.height;
+                    
+                    if (scrollPos >= canvasTop && scrollPos <= canvasBottom) {
+                        document.getElementById('currentPage').textContent = index + 1;
+                    }
+                });
+            }, 100);
+        });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,33 @@
+    <style>
+            .navig {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+            z-index: 1000;
+        }
+
+        .navig a {
+            margin: 0 10px;
+            text-decoration: none;
+            color: var(--primary-color);
+        }
+        @media print {
+            .navig {
+                display: none !important;
+            }
+        }
+            
+    </style>
+
+<div class="navig">
+    {% if step.previous_id_step %}
+    <a href="{% url 'step_medias' step.previous_id_step %}"><i class="bi bi-arrow-left"></i> Précédent</a>
+    {% endif %}
+    {% if step.next_id_step %}
+    <a href="{% url 'step_medias' step.next_id_step %}">Suivant <i class="bi bi-arrow-right"></i></a>
+    {% endif %}
+</div>

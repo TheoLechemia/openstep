@@ -28,24 +28,27 @@
         
         body {
             font-family: 'Lato', sans-serif;
-            background-color: var(--light-bg);
             color: var(--text-color);
             line-height: 1.7;
-            font-size: 10pt
+            font-size: 10pt;
         }
+
+        /* Canvas A4 en paysage */
+        .a4-canvas {
+            width: 297mm;
+            height: 210mm;
+            background: white;
+            margin: 0 auto 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
         @page {
-                size: A4;
-                margin: 1.5cm;
-                size: landscape
-
-
-            }
-
-        @media (width <= 1200px) {
-            .navig {
-                display: none;
-            }
+            size: A4 landscape;
+            margin: 0px;
         }
+
 
         h1, h2, h3 {
             font-family: 'Playfair Display', serif;
@@ -54,15 +57,10 @@
         
         /* Hero Section */
         .hero-section {
-            padding: 15px 10px 10px;
             text-align: center;
-            background: white;
         }
         
-        .hero-content {
-            max-width: 800px;
-            margin: 0 auto;
-        }
+
 
         .date-badge {
             display: inline-block;
@@ -74,13 +72,13 @@
             letter-spacing: 1.5px;
             text-transform: uppercase;
             font-weight: 400;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
         }
 
         .hero-title {
             font-size: 1.8rem;
             font-weight: 700;
-            margin-bottom: 8px;
+            margin-bottom: 5px;
             color: var(--primary-color);
             line-height: 1.2;
         }
@@ -91,143 +89,73 @@
             letter-spacing: 1px;
             color: var(--text-color);
         }
-        
-        /* Content Section */
-        .content-section {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 30px 20px 40px;
-            padding: 15px 10px 20px;
-
-        }
-
-        .map-container {
-            /* max-width: 1200px;
-            margin: 0 auto; */
+        .page-table {
+            display: table;
             width: 100%;
-            max-width: 100%;
-            overflow: hidden;
-            box-sizing: border-box;
+            height: 100%;
+            table-layout: fixed;
+        }
+        .page-cell {
+            display: table-cell;
+            vertical-align: top;
         }
 
-        @media print {
+
+        .left-col {
+            overflow-y: auto;
+            height: 100%;
+            gap: 15px;
+            padding: 10px;
+            width: 66%;
+            padding-right: 10px;
+        }
+
+        .right-col {
+            height: 100%;
+            width: 34%;
+            text-align: center;
+        }
+
+
+
+   
+
         #img_map {
-            max-width: 100% !important;
-            height: auto !important;
-            page-break-inside: avoid;
-        }
+            width: 100%;
+            object-fit: cover;
         }
 
+            
 
         .description-block {
+            margin: 5px;
             font-size: 0.85rem;
             line-height: 1.4;
             color: var(--text-color);
-            text-align: center;
             column-count: 2;
-            column-gap: 2rem;
-            padding: 20px;
-            background-color: white;
-            margin-bottom: 5px;
+            column-gap: 1.5rem;
+            padding: 15px;
+            background-color: #fafafa;
             border-radius: 5px;
             border: solid #00000026 1px;
-
         }
 
         .description-block p {
-            margin-bottom: 0rem;
-                text-indent: 0;
-
+            margin-bottom: 0.5rem;
+            text-indent: 0;
+            text-align: justify;
         }
 
-        .description-block p:first-child::first-letter {
-            font-size: 2.5rem;
-            font-family: 'Playfair Display', serif;
-            float: left;
-            line-height: 0.9;
-            margin: 0.05em 0.08em 0 0;
-            color: var(--accent-color);
-        }
-
-        /* Map Section */
-        .map-section {
-            margin: 40px 0;
-            background: white;
-            padding: 15px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-        }
-
-        .map-title {
-            text-align: center;
-            font-size: 1.3rem;
-            margin-bottom: 15px;
-            color: var(--primary-color);
-        }
-
-        #map {
-            height: 200px;
-            border-radius: 8px;
-        }
-
-        .map-info {
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            margin-top: 20px;
-            flex-wrap: wrap;
-        }
-
-        .map-info-item {
-            text-align: center;
-        }
-
-        .map-info-icon {
-            font-size: 1.2rem;
-            color: var(--accent-color);
-            margin-bottom: 5px;
-        }
-
-        .map-info-label {
-            font-size: 0.65rem;
-            text-transform: uppercase;
-            letter-spacing: 1.2px;
-            color: #999;
-            margin-bottom: 2px;
-        }
-
-        .map-info-value {
-            font-size: 0.85rem;
-            color: var(--primary-color);
-        }
 
         /* Comments Section */
         .comments-section {
-            /* max-width: 1100px; */
-            margin: 20px auto;
-            /* display: grid;
-            grid-template-columns: 1fr 1fr; 
-            column-gap: 1.5rem;
-            position: relative;  */
-            column-count: 3;
-            column-gap: 0.8rem;
-              column-rule-width: 1px;
-  column-rule-style: dotted;
-  column-rule-color: var(--accent-color);;
+            margin: 5px;
+            column-count: 2;
+            column-gap: 1rem;
+            column-rule-width: 1px;
+            column-rule-style: dotted;
+            column-rule-color: var(--accent-color);
         }
-        /* .comments-section::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            left: 50%;            
-            width: 1px;
-            background: #ccc;
-            transform: translateX(-50%);
-            } */
-            
-
-
-
 
         .comment-text {
             line-height: 1.5;
@@ -235,13 +163,6 @@
             font-style: italic;
             position: relative;
             z-index: 1;
-        }
-
-        .comment-date {
-            text-align: right;
-            font-size: 0.4rem;
-            color: #999;
-            letter-spacing: 0.8px;
         }
 
         /* Divider */
@@ -267,140 +188,86 @@
             vertical-align: middle;
         }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-
-
-
-
-            #map {
-                height: 250px;
-            }
-
+        .comment-item {
+            background: white;
+            padding: 5px;
+            margin-bottom: 0.5rem;
+            font-size: 0.6rem;
+            border: solid #00000026 1px;
+            border-left: 3px solid var(--accent-color);
+            box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+            border-radius: 5px;
+            position: relative;
+            break-inside: avoid;
         }
 
-
-.timeline {
-  max-width: 900px;
-  margin: 40px auto;
-  display: grid;
-  grid-template-columns: 1fr 1fr; /* toujours 2 colonnes */
-  column-gap: 2rem;
-}
-
-/* chaque commentaire */
-
-.comment-item {
-    background: white;
-    padding: 5px;
-    margin-bottom: 0.5rem;
-    font-size: 0.6rem;
-    border: solid #00000026 1px;
-    border-left: 3px solid var(--accent-color);
-    box-shadow: 0 3px 12px rgba(0,0,0,0.06) ;
-    border-radius: 5px;
-    position: relative;
-
-    p {
-        margin-bottom: 0px!important;
-    }
-}
-
-
-.timeline {
-  max-width: 900px;
-  margin: 40px auto;
-  display: grid;
-  grid-template-columns: 1fr 1fr; /* 2 colonnes fixes */
-  column-gap: 2rem;
-  position: relative; /* nécessaire pour que ::before se cale sur ce bloc */
-}
-
-/* ligne centrale */
-.timeline::before {
-  content: '';
-  position: absolute;
-  top: 10%;
-  bottom: 25%;
-  left: 50%;              /* milieu du conteneur */
-  width: 4px;
-  background: #ccc;
-  transform: translateX(-50%);
-}
-
-
+        .comment-item p {
+            margin-bottom: 0px !important;
+        }
 
     </style>
 </head>
 <body>
-    <!-- Section Hero -->
-    <div class="hero-section">
-        <div class="hero-content">
-            <div class="date-badge">
-                Jour {{ step.day_of_travel }} • {{ step.date|date:"d F Y" }}
-            </div>
-            <h1 class="hero-title">{{ step.name|default:"Sans titre" }}</h1>
-            {% if step.state or step.country %}
-            <div class="hero-location">
-                 <i class="bi bi-pin-map-fill"></i>
-                {% if step.state %}{{ step.state }}{% if step.country %}, {% endif %}{% endif %}
-                {% if step.country %}{{ step.country }}{% endif %}
-            </div>
-            {% endif %}
-        </div>
-    </div>
-
-    <!-- Contenu principal -->
-    <div class="content-section">
-        
-            <div class="description-block">
-                {{ step.description|safe|linebreaks }}
-            </div>
-            <div class="map-container">
-                <img id="img_map" src="{{map_url}}" alt="">
-            </div>
-
-       
-
-        <!-- Commentaires -->
-        {% if step.comments.all %}
-        <div class="divider">
-            <span class="divider-line"></span>
-            <span class="divider-dot"></span>
-            <span class="divider-line"></span>
-        </div>
-
-
-        <div class="comments-section">
-            
-            {% for comment in step.comments.all %}
-            <!-- -->
-                 <div class="comment-item">
-                    <div class="row align-items-center">
-                        <!-- <div class="col-1">
-                            <i class="bi bi-emoji-smile"></i>
-                        </div> -->
-                         <div class="comment-text col-12">
-                             {{ comment.message }}
-                         </div>
-
+    <!-- Canvas A4 -->
+    <div class="a4-canvas" data-page="1">
+        <div class="page-table">
+            <!-- Colonne gauche col-8 : Hero + Description + Commentaires -->
+            <div class="page-cell left-col">
+                <!-- Section Hero -->
+                <div class="hero-section">
+                    <div class="hero-content">
+                        <div class="date-badge">
+                            Jour {{ step.day_of_travel }} • {{ step.date|date:"d F Y" }}
+                        </div>
+                        <h1 class="hero-title">{{ step.name|default:"Sans titre" }}</h1>
+                        {% if step.state or step.country %}
+                        <div class="hero-location">
+                            <i class="bi bi-pin-map-fill"></i>
+                            {% if step.state %}{{ step.state }}{% if step.country %}, {% endif %}{% endif %}
+                            {% if step.country %}{{ step.country }}{% endif %}
+                        </div>
+                        {% endif %}
                     </div>
-                 </div>
-            <!-- <div class="comment-date">
-                {{ comment.date|date:"d F Y à H:i" }}
-            </div> -->
-            {% endfor %}
+                </div>
+
+                <!-- Description -->
+                <div class="description-block">
+                    {{ step.description|safe }}
+                </div>
+
+                <!-- Commentaires -->
+                {% if step.comments.all %}
+                <div class="divider">
+                    <span class="divider-line"></span>
+                    <span class="divider-dot"></span>
+                    <span class="divider-line"></span>
+                </div>
+
+                <div class="comments-section">
+                    {% for comment in step.comments.all %}
+                    <div class="comment-item">
+                        <div class="comment-text">
+                            {{ comment.message }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Colonne droite col-4 : Carte sur toute la hauteur -->
+            <div class="page-cell right-col">
+                <div class="map-container">
+                    <img id="img_map" src="{{map_url}}" alt="Pour des raison de performance, la carte n'est pas affichée     en preview html, elle le sera dans le pdf">
+                </div>
+            </div>
         </div>
-        {% endif %}
-
     </div>
 
-    <div class="navig">
-        <a href="{% url 'step_desc' step.previous_id_step %} ">Previous</a>
-        <a href="{% url 'step_desc' step.next_id_step %} ">Next</a>
-    </div>
+{% if context.step_page %}
+    {% include "step_pdf_medias.html" with step=s.step media_with_cols=s.media_with_cols %}
+{% endif %}
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
 </body>
 </html>
