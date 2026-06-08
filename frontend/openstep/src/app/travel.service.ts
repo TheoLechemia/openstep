@@ -5,15 +5,15 @@ import { BehaviorSubject, Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class TravelService {
-  public currentTravelId: number;
+  public currentTravelUuid: string;
   public travelObservable = new BehaviorSubject(null);;
-  constructor() { 
-    
+  constructor() {
+
   }
 
   setTravel(travel) {
-    this.travelObservable.next(travel);    
-    this.currentTravelId = travel.id;
+    this.travelObservable.next(travel);
+    this.currentTravelUuid = travel.uuid;
   }
 
   get travel() {

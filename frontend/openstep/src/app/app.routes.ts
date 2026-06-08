@@ -4,6 +4,6 @@ import { TravelsComponent } from './travels/travels.component';
 import { StepDetailComponent } from './step-detail/step-detail.component';
 export const routes: Routes = [
     {path: "", component: TravelsComponent},
-    {path: "travel/:id", component: TravelDetailComponent},
-    {path: "travel/:idTravel/step/:idStep", component: StepDetailComponent},
+    {path: "travel/:uuid", component: TravelDetailComponent},
+    {path: "travel/:uuidTravel/step/:idStep", component: StepDetailComponent},
 ];

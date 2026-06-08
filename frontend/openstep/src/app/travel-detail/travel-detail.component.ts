@@ -33,14 +33,14 @@ export class TravelDetailComponent implements AfterViewInit {
   public nonPositionelSteps = []
   public steps: Array<any>;
   @Input()
-  set id(idTravel: number) {    
+  set uuid(uuidTravel: string) {
     // load travel and store it in travel service
     // it avoid loading it on each initinialization
-    if (idTravel != this.travelService.currentTravelId) {
-      this._api.getTravel(idTravel).subscribe(travel => {
+    if (uuidTravel != this.travelService.currentTravelUuid) {
+      this._api.getTravel(uuidTravel).subscribe(travel => {
         this.travelService.setTravel(travel)
       });
-    }  
+    }
   }
 
   ngAfterViewInit (): void {
@@ -87,8 +87,8 @@ export class TravelDetailComponent implements AfterViewInit {
   }
 
 
-  goToDetail(idStep) {        
-    this._router.navigate(["travel", this.travel.id, "step", idStep])
+  goToDetail(idStep) {
+    this._router.navigate(["travel", this.travel.uuid, "step", idStep])
   }
 
   generatePopup(feature) {    
@@ -110,7 +110,7 @@ export class TravelDetailComponent implements AfterViewInit {
 
               </div>
               <div class="button-see-step">
-              <a href="./#/travel/${this.travel.id}/step/${feature.id}" > 
+              <a href="./#/travel/${this.travel.uuid}/step/${feature.id}" >
               <button class="mdc-button mdc-button--unelevated mat-mdc-unelevated-button mat-unthemed mat-mdc-button-base" > See this step</button>
               </a>
               </div>

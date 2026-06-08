@@ -18,8 +18,8 @@ export class ApiService {
     )
   }
 
-  getTravel(idTravel:number): Observable<any> {
-    return this._http.get<any>(`${this.configService.config.API_ENDPOINT}/travels/${idTravel}/`)
+  getTravel(uuidTravel:string): Observable<any> {
+    return this._http.get<any>(`${this.configService.config.API_ENDPOINT}/travels/${uuidTravel}/`)
   }
 
   getStep(idStep:number): Observable<any> {

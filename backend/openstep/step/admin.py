@@ -12,6 +12,9 @@ from step.models import Step, Travel, Media, Comments
 
 
 class TravelAdmin(admin.ModelAdmin):
+    list_display = ("name", "uuid", "is_public", "start_date", "end_date")
+    list_editable = ("is_public",)
+    readonly_fields = ("uuid",)
 
     def get_queryset(self, request):
         return Travel.objects.get_authorized(request)

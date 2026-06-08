@@ -3,7 +3,7 @@ import { MatButtonModule } from '@angular/material/button';
 
 import { MatIcon } from '@angular/material/icon';
 import {  CommonModule, DatePipe } from '@angular/common';
-import * as L from "leaflet" 
+import * as L from "leaflet"
 import { LightboxModule } from 'ngx-lightbox';
 import { Lightbox } from 'ngx-lightbox';
 
@@ -45,7 +45,7 @@ export class StepDetailComponent implements AfterViewInit  {
   public steps: Array<any> = [];
   public step: any;
   public idStep_: number;
-  public idTravel: number;
+  public uuidTravel: string;
   public currentIdtravel: number;
   readonly dialog = inject(MatDialog);
   public commentMessage: string;
@@ -54,18 +54,18 @@ export class StepDetailComponent implements AfterViewInit  {
   swiperRef: ElementRef | undefined;
   swiper?: Swiper;
 
-  ngAfterViewInit(): void {    
+  ngAfterViewInit(): void {
 
     // interact('#rotate-area').gesturable({
     //   onmove: function (event) {
     //     var arrow = document.getElementById('arrow')
-    
+
     //     angle += event.da
-    
+
     //     arrow.style.webkitTransform =
     //     arrow.style.transform =
     //       'rotate(' + angle + 'deg)'
-    
+
     //     document.getElementById('angle-info').textContent =
     //       angle.toFixed(2) + '\u00b0'
     //   },
@@ -82,17 +82,17 @@ export class StepDetailComponent implements AfterViewInit  {
     //     },
     //     move (event) {
     //       console.log("mooove", event);
-          
+
     //       position.x += event.dx
     //       position.y += event.dy
-    
+
     //       // event.target.style.transform =
     //       //   `translate(${position.x}px, ${position.y}px)`
     //     },
 
     //     end(event) {
     //       console.log("end", event);
-          
+
     //     }
     //   }
     // })
@@ -101,26 +101,26 @@ export class StepDetailComponent implements AfterViewInit  {
     // addEventListener("touchstart", (event) => {
 
     //   console.log(event);
-      
+
     // });
 
     // addEventListener("touchmove", (event) => {
 
     //   console.log(event);
-      
+
     // });
 
     // addEventListener("touchend", (event) => {
 
     //   console.log("enddd", event);
     //   console.log(event.changedTouches[0].pageX);
-      
-      
+
+
     // });
 
 
     // document.addEventListener('swiped', (e:any) => {
-      
+
     //   if(e.detail.dir == 'right') {
     //     const swipe = document.getElementById("left-swipper");
     //     swipe.style.display = "block"
@@ -134,36 +134,35 @@ export class StepDetailComponent implements AfterViewInit  {
     // });
 
     this._route.params.subscribe(route => {
-      const currentIdTravel = parseInt(route["idTravel"]);
+      const currentUuidTravel = route["uuidTravel"];
       // TODO : ne pas recharger le travel à chaque fois !!
       this.step = null;
       const swipe = document.getElementById("left-swipper");
       swipe.style.display = "none"
-      this.idTravel = currentIdTravel;
+      this.uuidTravel = currentUuidTravel;
       this.idStep_ =  parseInt(route["idStep"]);
-      if(this.travelService.travel && this.travelService.travel.id == currentIdTravel) {
+      if(this.travelService.travel && this.travelService.travel.uuid == currentUuidTravel) {
         this.setStepsAndStep(this.travelService.travel, this.idStep_)
       }
-      if(this.travelService.travel && this.travelService.travel.id != currentIdTravel) {
-        console.log("c'est pas le meme !");
-          this._api.getTravel(currentIdTravel).subscribe(travel => {
+      if(this.travelService.travel && this.travelService.travel.uuid != currentUuidTravel) {
+          this._api.getTravel(currentUuidTravel).subscribe(travel => {
           this.travelService.setTravel(travel);
           this.setStepsAndStep(travel, this.idStep_)
-        });    
+        });
       }
       if(!this.travelService.travel) {
-        this._api.getTravel(currentIdTravel).subscribe(travel => {
+        this._api.getTravel(currentUuidTravel).subscribe(travel => {
           this.travelService.setTravel(travel);
           this.setStepsAndStep(travel, this.idStep_)
-        });      
+        });
 
       }
     })
   }
 
-  zoomOnLayer() {  
-    // Moche mais trouve pas comment faire d'autre      
-    setTimeout(()=> {          
+  zoomOnLayer() {
+    // Moche mais trouve pas comment faire d'autre
+    setTimeout(()=> {
           this._mapService.zoomOnLayer(this.idStep_, 15);
 
       }, 200)
@@ -175,12 +174,12 @@ export class StepDetailComponent implements AfterViewInit  {
       this.step = travel.steps.features.find(step => {
         return step.id == idStep
       });
-      
+
       this._mapService.displayTravelLine(travel.steps);
 
       setTimeout(()=> {
-    // Moche mais trouve pas comment faire d'autre      
-          
+    // Moche mais trouve pas comment faire d'autre
+
           this._mapService.zoomOnLayer(this.idStep_, 15);
 
       }, 200)
@@ -191,9 +190,9 @@ export class StepDetailComponent implements AfterViewInit  {
   }
 
 
-  nextStep() {    
+  nextStep() {
     let nextIndex = this.stepIndexInTravel + 1;
-    let nextStepIsPositional = true; 
+    let nextStepIsPositional = true;
     while(nextStepIsPositional && nextIndex != this.steps.length) {
       let nextStep = this.steps[nextIndex];
       if(nextStep.properties.positional_step) {
@@ -202,16 +201,16 @@ export class StepDetailComponent implements AfterViewInit  {
         nextStepIsPositional = false;
       }
     }
-    
+
     if(nextIndex != this.steps.length) {
       const nextIdStep = this.steps[nextIndex].id;
-      this._router.navigate(["travel", this.idTravel, "step", nextIdStep])      
+      this._router.navigate(["travel", this.uuidTravel, "step", nextIdStep])
     }
   }
 
   previousStep() {
     let previousIndex = this.stepIndexInTravel - 1;
-    let previousStepIsPositional = true; 
+    let previousStepIsPositional = true;
     while(previousStepIsPositional && previousIndex >= 0) {
       let previousStep = this.steps[previousIndex];
       if(previousStep.properties.positional_step) {
@@ -220,15 +219,15 @@ export class StepDetailComponent implements AfterViewInit  {
         previousStepIsPositional = false;
       }
     }
-    
+
     if(previousIndex >= 0) {
       const previousIdStep = this.steps[previousIndex].id;
-      this._router.navigate(["travel", this.idTravel, "step", previousIdStep])
+      this._router.navigate(["travel", this.uuidTravel, "step", previousIdStep])
     };
-      
+
   }
 
-  addComment(){    
+  addComment(){
     this._api.postComment({
       "step": this.step.id,
       "message": this.commentMessage

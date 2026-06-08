@@ -22,7 +22,7 @@ class MediaSerializer(serializers.ModelSerializer):
 class TravelSerializerNoStep(serializers.ModelSerializer):
     class Meta:
         model = Travel
-        fields = ["name", "id", "description"]
+        fields = ["name", "id", "uuid", "description"]
 
 class StepSerializer(gis_serializers.GeoFeatureModelSerializer):
     medias = MediaSerializer(many=True)
@@ -59,6 +59,17 @@ class StepViewSet(viewsets.ModelViewSet):
 class TravelViewSet(viewsets.ModelViewSet):
     queryset = Travel.objects.all().prefetch_related("steps")
     serializer_class = TravelSerializer
+    # Recherche des voyages par uuid au lieu de pk. Ceci fait aussi générer au
+    # routeur DRF l'URL de détail en /travels/<uuid>/ (et non /travels/<pk>/).
+    lookup_field = "uuid"
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        # La page d'accueil (list) n'expose que les voyages publics. Un voyage
+        # privé reste accessible via son UUID (retrieve) mais n'est jamais listé.
+        if self.action == "list":
+            queryset = queryset.filter(is_public=True)
+        return queryset
 
 from rest_framework.response import Response
 from rest_framework import status

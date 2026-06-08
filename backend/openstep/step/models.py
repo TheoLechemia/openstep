@@ -1,3 +1,4 @@
+import uuid
 from datetime import datetime, time
 from typing import Any, Iterable
 from django.contrib.gis.db import models
@@ -21,6 +22,8 @@ class TravelManager(models.Manager):
 
 
 class Travel(models.Model):
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, db_index=True)
+    is_public = models.BooleanField(default=True, verbose_name=_("Public"))
     name = models.CharField(max_length=200)
     description =  models.CharField()
     start_date = models.DateField()
