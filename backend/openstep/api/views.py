@@ -13,11 +13,25 @@ class CommentSerializer(serializers.ModelSerializer):
 
 class MediaSerializer(serializers.ModelSerializer):
     caption = serializers.CharField(source="legend")
-    src = serializers.ImageField(source="media_file")
-    thumb = serializers.ImageField(source="media_file")
+    src = serializers.SerializerMethodField()
+    thumb = serializers.SerializerMethodField()
+    media_type = serializers.ReadOnlyField()
+
     class Meta:
         model = Media
-        fields = ('id','src', "thumb", "caption")
+        fields = ('id', 'src', "thumb", "caption", "media_type")
+
+    def _absolute_url(self, url):
+        if not url:
+            return None
+        request = self.context.get("request")
+        return request.build_absolute_uri(url) if request else url
+
+    def get_src(self, obj):
+        return self._absolute_url(obj.file_url)
+
+    def get_thumb(self, obj):
+        return self._absolute_url(obj.file_url)
 
 class TravelSerializerNoStep(serializers.ModelSerializer):
     class Meta:
@@ -26,14 +40,14 @@ class TravelSerializerNoStep(serializers.ModelSerializer):
 
 class StepSerializer(gis_serializers.GeoFeatureModelSerializer):
     medias = MediaSerializer(many=True)
-    first_media = MediaSerializer()
+    first_image = MediaSerializer()
     travel = TravelSerializerNoStep()
     comments = CommentSerializer(many=True)
 
     class Meta:
         model = Step
         fields = (
-            'travel', 'positional_step', 'comments', 'id', 'name', 'location', 'description', 'date', 'medias', 'first_media', 'day_of_travel', "country", "state")
+            'travel', 'positional_step', 'comments', 'id', 'name', 'location', 'description', 'date', 'medias', 'first_image', 'day_of_travel', "country", "state")
         geo_field = "location"
 
 
