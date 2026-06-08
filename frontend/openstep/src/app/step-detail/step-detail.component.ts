@@ -186,14 +186,29 @@ export class StepDetailComponent implements AfterViewInit  {
       }, 200)
   }
 
+  goToStep(idStep) {
+    this._router.navigate(['travel', this.idTravel, 'step', idStep]);
+  }
+
+  pointToLayer(feature, latLng) {
+    // On délègue la création du marqueur au service (pour garder l'icône et
+    // l'enregistrement dans layers, dont dépend zoomOnLayer), puis on ajoute
+    // la navigation vers le step cliqué.
+    const marker = this._mapService.pointToLayer(feature, latLng);
+    if (!feature.properties.positional_step) {
+      marker.on('click', () => this.goToStep(feature.id));
+    }
+    return marker;
+  }
+
   open(index) {
     this._lightbox.open(this.step.properties.medias, index);
   }
 
 
-  nextStep() {    
+  nextStep() {
     let nextIndex = this.stepIndexInTravel + 1;
-    let nextStepIsPositional = true; 
+    let nextStepIsPositional = true;
     while(nextStepIsPositional && nextIndex != this.steps.length) {
       let nextStep = this.steps[nextIndex];
       if(nextStep.properties.positional_step) {
@@ -202,16 +217,15 @@ export class StepDetailComponent implements AfterViewInit  {
         nextStepIsPositional = false;
       }
     }
-    
+
     if(nextIndex != this.steps.length) {
-      const nextIdStep = this.steps[nextIndex].id;
-      this._router.navigate(["travel", this.idTravel, "step", nextIdStep])      
+      this.goToStep(this.steps[nextIndex].id);
     }
   }
 
   previousStep() {
     let previousIndex = this.stepIndexInTravel - 1;
-    let previousStepIsPositional = true; 
+    let previousStepIsPositional = true;
     while(previousStepIsPositional && previousIndex >= 0) {
       let previousStep = this.steps[previousIndex];
       if(previousStep.properties.positional_step) {
@@ -220,12 +234,10 @@ export class StepDetailComponent implements AfterViewInit  {
         previousStepIsPositional = false;
       }
     }
-    
+
     if(previousIndex >= 0) {
-      const previousIdStep = this.steps[previousIndex].id;
-      this._router.navigate(["travel", this.idTravel, "step", previousIdStep])
-    };
-      
+      this.goToStep(this.steps[previousIndex].id);
+    }
   }
 
   addComment(){    
