@@ -185,6 +185,21 @@ export class StepDetailComponent implements AfterViewInit  {
       }, 200)
   }
 
+  goToStep(idStep) {
+    this._router.navigate(['travel', this.uuidTravel, 'step', idStep]);
+  }
+
+  pointToLayer(feature, latLng) {
+    // On délègue la création du marqueur au service (pour garder l'icône et
+    // l'enregistrement dans layers, dont dépend zoomOnLayer), puis on ajoute
+    // la navigation vers le step cliqué.
+    const marker = this._mapService.pointToLayer(feature, latLng);
+    if (!feature.properties.positional_step) {
+      marker.on('click', () => this.goToStep(feature.id));
+    }
+    return marker;
+  }
+
   open(index) {
     this._lightbox.open(this.step.properties.medias, index);
   }
@@ -203,8 +218,7 @@ export class StepDetailComponent implements AfterViewInit  {
     }
 
     if(nextIndex != this.steps.length) {
-      const nextIdStep = this.steps[nextIndex].id;
-      this._router.navigate(["travel", this.uuidTravel, "step", nextIdStep])
+      this.goToStep(this.steps[nextIndex].id);
     }
   }
 
@@ -221,10 +235,8 @@ export class StepDetailComponent implements AfterViewInit  {
     }
 
     if(previousIndex >= 0) {
-      const previousIdStep = this.steps[previousIndex].id;
-      this._router.navigate(["travel", this.uuidTravel, "step", previousIdStep])
-    };
-
+      this.goToStep(this.steps[previousIndex].id);
+    }
   }
 
   addComment(){

@@ -1,25 +1,25 @@
 <div id="left-swipper">
 
-</div>   
-   
+</div>
+
    <div id="main" class="row height-100 g-0">
         <div class="col-12 col-md-7 order-md-2" id="map-container">
-            <app-map [geojson]="steps" (layerLoaded)="zoomOnLayer()" ></app-map>
+            <app-map [geojson]="steps" [pointToLayer]="pointToLayer.bind(this)" (layerLoaded)="zoomOnLayer()" ></app-map>
         </div>
         <div class="col-12 col-md-5 order-md-1 height-100" id="detail-container">
             <div class="">
-                <a [routerLink]="['/travel', travelService.travel?.id]"> 
+                <a [routerLink]="['/travel', travelService.travel?.id]">
                      <small class="me-2 p-2 mt-2 primary-color">  {{travelService.travel?.name}} </small>
                 </a>
 
                 <!-- <mat-icon class="swipe-icon">swipe</mat-icon> -->
 
             </div>
-            <!-- <swiper-container 
+            <!-- <swiper-container
                 #swiperRef
                 init="false"
-                id="caroussel-container" 
-                class="mySwiper" 
+                id="caroussel-container"
+                class="mySwiper"
             > -->
                 <!-- @for (step of steps; track step.id; let i = $index) { -->
 
@@ -54,7 +54,7 @@
                                     <img src="{{media.src}}" (click)="open(i)" style="display: block; width: 100%;">
                                 </slide>
                             }
-                            
+
                         </carousel>
                         <div class="description-padding" >
 
@@ -62,33 +62,33 @@
 
                             <mat-list>
                                 @for(comment of step.properties.comments; track comment) {
-        
+
                                     <p>
                                             <mat-icon matListItemIcon>mood</mat-icon>
-        
+
                                         {{comment.message}} <br>
                                             <small class="text-muted">
                                                 {{comment.date | date:'short'}}
                                             </small>
                                     </p>
-        
+
                                 }
-        
+
                             </mat-list>
-        
+
                             <div class="row">
-        
+
                                 <mat-form-field class="col-10" appearance="outline">
                                     <mat-label>Comment</mat-label>
                                     <textarea [(ngModel)]="commentMessage" matInput placeholder="Comment"> </textarea>
                                     <mat-icon matSuffix>comment</mat-icon>
                                 </mat-form-field>
-            
+
                                 <button (click)="addComment()" class="ms-2 col-2 mt-3" mat-mini-fab aria-label="Example icon button with a home icon">
                                     <mat-icon>send</mat-icon>
-                                  </button>                
+                                  </button>
                             </div>
-        
+
                         </div>
                         <br>
                     } @else {
@@ -96,7 +96,7 @@
                     }
 
                     <!-- </swiper-slide> -->
-                
+
                 <!-- } -->
             <!-- </swiper-container> -->
         </div>
