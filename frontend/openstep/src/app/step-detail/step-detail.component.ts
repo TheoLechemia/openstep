@@ -200,8 +200,14 @@ export class StepDetailComponent implements AfterViewInit  {
     return marker;
   }
 
-  open(index) {
-    this._lightbox.open(this.step.properties.medias, index);
+  open(media) {
+    // ngx-lightbox n'affiche que des images : on construit un album d'images seules
+    // et on retrouve l'index du média cliqué dans cette liste filtrée.
+    const images = this.step.properties.medias.filter(
+      (m) => m.media_type !== 'video'
+    );
+    const index = images.indexOf(media);
+    this._lightbox.open(images, index);
   }
 
 

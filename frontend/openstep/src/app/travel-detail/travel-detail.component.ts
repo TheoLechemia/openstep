@@ -99,7 +99,7 @@ export class TravelDetailComponent implements AfterViewInit {
     let differenceInTime = now.getTime() - stepDay.getTime();
     let diffenreceInDay = Math.round(differenceInTime / (1000 * 3600 * 24));
     if(hasMedias) {      
-      firstMedia = feature.properties.first_media.thumb;
+      firstMedia = feature.properties.first_image?.thumb;
     }    
     return `
           <div class="img-container" style="background-image: url(${firstMedia});">

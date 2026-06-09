@@ -49,9 +49,13 @@
                         </div>
                         <!-- No loop no working... -->
                         <carousel [interval]="1500000000">
-                            @for(media of step.properties.medias; track media.id; let i = $index) {
+                            @for(media of step.properties.medias; track media.id) {
                                 <slide style="cursor: pointer;">
-                                    <img src="{{media.src}}" (click)="open(i)" style="display: block; width: 100%;">
+                                    @if (media.media_type === 'video') {
+                                        <video [src]="media.src" controls style="display: block; width: 100%;"></video>
+                                    } @else {
+                                        <img src="{{media.src}}" (click)="open(media)" style="display: block; width: 100%;">
+                                    }
                                 </slide>
                             }
 

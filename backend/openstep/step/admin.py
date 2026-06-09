@@ -34,21 +34,28 @@ class StepForm(forms.ModelForm):
             "positional_step": _('A positional step is a step without description and media. It just help to draw the travel on the map')
         }
 
-    
+
 
 
 
 class MediaInline(admin.TabularInline):
     model = Media
     extra = 0
-    fields = ("legend", "media_file", "media_preview")
+    fields = ("legend", "image_file", "video_file", "media_preview")
     readonly_fields = ("media_preview",)
 
     @admin.display(description="Preview")
     def media_preview(self, obj):
-        return mark_safe(
-            f'<img src="{obj.media_file.url}" style="object-fit:contain" width="150" />'
-        )
+        if obj.media_type == "video" and obj.video_file:
+            return mark_safe(
+                f'<video src="{obj.video_file.url}" style="object-fit:contain" '
+                f'width="150" controls></video>'
+            )
+        if obj.image_file:
+            return mark_safe(
+                f'<img src="{obj.image_file.url}" style="object-fit:contain" width="150" />'
+            )
+        return ""
 
 
 class CustomGeoWidget(OSMWidget):
@@ -58,7 +65,7 @@ class StepAdmin(GISModelAdmin):
     gis_widget = CustomGeoWidget
     form = StepForm
     inlines = [MediaInline]
-    list_display = ("name", "description", "media_preview",)
+    list_display = ("name", "description", "image_preview",)
     fields = ("travel", "positional_step", "name", "date", "location", "description")
 
     def get_queryset(self, request):
@@ -68,14 +75,14 @@ class StepAdmin(GISModelAdmin):
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "travel":
             kwargs["queryset"] = Travel.objects.get_authorized(request)
-        return super().formfield_for_foreignkey(db_field, request, **kwargs)     
-       
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
-    @admin.display(description="Media")
-    def media_preview(self, obj):
-        if obj.first_media:
+
+    @admin.display(description="Image")
+    def image_preview(self, obj):
+        if obj.first_image:
             return mark_safe(
-                f'<img src="{obj.first_media.media_file.url}" style="object-fit:contain" width="150" />'
+                f'<img src="{obj.first_image.image_file.url}" style="object-fit:contain" width="150" />'
             )
 
 
