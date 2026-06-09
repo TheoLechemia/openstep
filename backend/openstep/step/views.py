@@ -1,5 +1,6 @@
 import random
 
+from bs4 import BeautifulSoup
 from django.shortcuts import render
 from .models import Step, Travel
 from django_weasyprint.views import WeasyTemplateResponse
@@ -13,7 +14,38 @@ from staticmap import StaticMap, CircleMarker, Line
 # Create your views here.
 
 
-class StepPdfDescMixin:
+class StepMixin:
+    def add_dropcap(self, html: str) -> str:
+        if not html:
+            return html
+
+        soup = BeautifulSoup(html, "html.parser")
+
+        # premier paragraphe réel
+        p = soup.find("p")
+        if not p:
+            return html
+
+        # récupérer le texte brut
+        text = p.get_text()
+        if not text:
+            return html
+
+        first_letter = text[0]
+        rest = text[1:]
+
+        # vider le <p>
+        p.clear()
+
+        # créer la lettrine
+        span = soup.new_tag("span", **{"class": "dropcap"})
+        span.string = first_letter
+
+        # reconstruire le paragraphe
+        p.append(span)
+        p.append(rest)
+
+        return str(soup)
 
     def get_map(self, step):
         travel_line_coords = [
@@ -27,11 +59,15 @@ class StepPdfDescMixin:
             url_template="https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}",
         )
 
-        m.add_line(Line(travel_line_coords, "#615A5AA4", 3))
+        m.add_line(Line(travel_line_coords, "white", 2))
+        # m.add_line(Line(travel_line_coords, "#E8B4B8", 1))
+        for point in travel_line_coords:
+            m.add_marker(CircleMarker(point, "white", 10))
+            m.add_marker(CircleMarker(point, "#ff8800", 8))
 
         center = (step.location.x, step.location.y)
-        m.add_marker(CircleMarker(center, "white", 25))
-        m.add_marker(CircleMarker(center, "#E8B4B8", 18))
+        m.add_marker(CircleMarker(center, "white", 30))
+        m.add_marker(CircleMarker(center, "#ff9900", 25))
 
         image = m.render(zoom=7, center=center)
 
@@ -41,14 +77,6 @@ class StepPdfDescMixin:
 
         return settings.MEDIA_URL + media_name
 
-    def get_context_data(self, id):
-        step = get_object_or_404(Step, id=id)
-        context = {"step": step}
-        context["map_url"] = self.get_map(step)
-        return context
-
-
-class StepPdfMediaMixin:
     def build_step_medias(self, step):
         medias = list(step.medias.all()[1:7])
         media_with_cols = []
@@ -81,70 +109,87 @@ class StepPdfMediaMixin:
 
     def get_context_data(self, id):
         step = get_object_or_404(Step, id=id)
+        description_html = self.add_dropcap(step.description)
         context = {"step": step}
+        step.description = description_html
+        context["map_url"] = self.get_map(step)
         context["media_with_cols"] = self.build_step_medias(step)
         context["has_custom_layout"] = hasattr(step, "book_layout")
+        context["step_page"] = True
         return context
 
 
-class StepDescView(View, StepPdfDescMixin):
-    model = Step
-    template_name = "step_pdf_description.html"
+class StepPreviewView(View, StepMixin):
+    template_name = "step_preview.html"
 
     def get(self, request, id, *args, **kwargs):
         context = self.get_context_data(id)
-        context["step_page"] = True
-        return render(request, self.template_name, context)
-
-
-class StepMediaView(View, StepPdfMediaMixin):
-    model = Step
-    template_name = "step_pdf_medias.html"
-
-    def get(self, request, id, *args, **kwargs):
-        context = self.get_context_data(id)
-        context["step_page"] = True
-        if context["has_custom_layout"]:
-            response = HttpResponse(
-                context["step"].book_layout.html, content_type="text/html"
-            )
-            return response
         return render(request, self.template_name, context)
 
 
 ## export pdf view
 
 
-class StepExportDescPDFView(View, StepPdfDescMixin):
-    template_name = "step_pdf_description.html"
+# class StepExportDescPDFView(View, StepPdfDescMixin):
+#     template_name = "step_pdf_description.html"
 
-    def get(self, request, id, *args, **kwargs):
-        return WeasyTemplateResponse(
-            request, self.template_name, self.get_context_data(id)
-        )
-
-
-class StepExportMediaPDFView(View, StepPdfMediaMixin):
-    template_name = "step_pdf_medias.html"
-
-    def get(self, request, id, *args, **kwargs):
-        context = self.get_context_data(id)
-        if context["has_custom_layout"]:
-
-            pdf = HTML(
-                string=context["step"].book_layout.html,
-            ).write_pdf()
-
-            response = HttpResponse(pdf, content_type="application/pdf")
-            response["Content-Disposition"] = 'inline; filename="layout.pdf"'
-            return response
-        return WeasyTemplateResponse(request, self.template_name, context)
+#     def get(self, request, id, *args, **kwargs):
+#         return WeasyTemplateResponse(
+#             request, self.template_name, self.get_context_data(id)
+#         )
 
 
-class TravelExportPDFView(View, StepPdfDescMixin, StepPdfMediaMixin):
+# class StepExportMediaPDFView(View, StepPdfMediaMixin):
+#     template_name = "step_pdf_medias.html"
+
+#     def get(self, request, id, *args, **kwargs):
+#         context = self.get_context_data(id)
+#         if context["has_custom_layout"]:
+
+#             pdf = HTML(
+#                 string=context["step"].book_layout.html,
+#             ).write_pdf()
+
+#             response = HttpResponse(pdf, content_type="application/pdf")
+#             response["Content-Disposition"] = 'inline; filename="layout.pdf"'
+#             return response
+#         return WeasyTemplateResponse(request, self.template_name, context)
+
+
+class TravelExportPDFView(View, StepMixin):
     template_name = "travel_pdf.html"
 
+    def create_main_map(self, travel):
+        travel_line_coords = [
+            (s.location.x, s.location.y)
+            for s in travel.steps.exclude(location__isnull=True)
+        ]
+
+        m = StaticMap(
+            width=1230,
+            height=800,
+            url_template="https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}",
+        )
+
+        m.add_line(Line(travel_line_coords, "white", 2))
+        # m.add_line(Line(travel_line_coords, "#E8B4B8", 1))
+        for point in travel_line_coords:
+            m.add_marker(CircleMarker(point, "white", 10))
+            m.add_marker(CircleMarker(point, "#ff8800", 6))
+
+        image = m.render(zoom=6)
+
+        media_name = f"map_travel_{travel.id}.png"
+        path = settings.MEDIA_ROOT / media_name
+        image.save(path)
+
+        return settings.MEDIA_URL + media_name
+
     def build_step_context(self, step):
+        if hasattr(step, "book_layout"):
+            return {"step": step, "has_custom_layout": True}
+
+        step.description = self.add_dropcap(step.description)
         return {
             "step": step,
             # "map_url": None,
@@ -167,14 +212,25 @@ class TravelExportPDFView(View, StepPdfDescMixin, StepPdfMediaMixin):
         travel = Travel.objects.get(id=id)
 
         steps_context = [self.build_step_context(step) for step in steps]
-
-        # return render(
-        #     request, self.template_name, {"steps": steps_context, "travel": travel}
-        # )
-
-        return WeasyTemplateResponse(
-            request,
-            self.template_name,
-            {"steps": steps_context, "travel": travel},
-            filename="travel.pdf",
-        )
+        format = request.GET.get("format", "preview")
+        if format == "preview":
+            return render(
+                request,
+                self.template_name,
+                {
+                    "steps": steps_context,
+                    "travel": travel,
+                    "travel_map": self.create_main_map(travel),
+                },
+            )
+        else:
+            return WeasyTemplateResponse(
+                request,
+                self.template_name,
+                {
+                    "steps": steps_context,
+                    "travel": travel,
+                    "travel_map": self.create_main_map(travel),
+                },
+                filename="travel.pdf",
+            )

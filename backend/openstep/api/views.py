@@ -4,7 +4,7 @@ from rest_framework import routers, serializers, viewsets
 from rest_framework_gis import serializers as gis_serializers
 
 
-from step.models import Step, Travel, Media, Comments, BookLayout
+from step.models import Step, Travel, Media, Comments, StepBookLayout
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -15,14 +15,8 @@ class CommentSerializer(serializers.ModelSerializer):
 
 class BookLayoutSerializer(serializers.ModelSerializer):
     class Meta:
-        model = BookLayout
+        model = StepBookLayout
         fields = "__all__"
-
-    # def create(self, validated_data):
-    #     return BookLayout.objects.update_or_create(
-    #         step=validated_data["step"],
-    #         defaults={"html": validated_data.get("html", "")},
-    #     )[0]
 
 
 class MediaSerializer(serializers.ModelSerializer):
@@ -118,7 +112,7 @@ class CommentiewSet(viewsets.ModelViewSet):
 class BookLayoutViewSet(viewsets.ModelViewSet):
     permission_classes = []
 
-    queryset = BookLayout.objects.all()
+    queryset = StepBookLayout.objects.all()
     serializer_class = BookLayoutSerializer
 
     def create(self, request, *args, **kwargs):
@@ -130,7 +124,7 @@ class BookLayoutViewSet(viewsets.ModelViewSet):
                 {"step": "This field is required."}, status=status.HTTP_400_BAD_REQUEST
             )
 
-        obj, created = BookLayout.objects.update_or_create(
+        obj, created = StepBookLayout.objects.update_or_create(
             step_id=step_id,
             defaults={"html": html},
         )

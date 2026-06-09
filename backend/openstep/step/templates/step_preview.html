@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            .navig {
+                position: fixed;
+                bottom: 20px;
+                left: 20px;
+                background: white;
+                padding: 10px 20px;
+                border-radius: 10px;
+                box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+                z-index: 1000;
+            }
+
+            .navig a {
+                margin: 0 10px;
+                text-decoration: none;
+                color: var(--primary-color);
+            }
+            @media print {
+                .navig {
+                    display: none !important;
+                }
+            }
+        /* Canvas A4 en paysage */
+        .a4-canvas {
+            width: 297mm;
+            height: 210mm;
+            /* background: white; */
+            margin: 0 auto 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+    background: #fdfcf8; /* papier ivoire */
+    box-shadow:
+        0 20px 60px rgba(0,0,0,0.25),
+        inset 0 0 0 1px rgba(0,0,0,0.04);
+        }
+
+        .a4-canvas {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+.a4-canvas::before,
+.a4-canvas::after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: #fdfcf8;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    border: 1px solid rgba(0,0,0,0.08);
+}
+.a4-canvas::before {
+    transform: translate(4mm, 4mm);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.18);
+}
+.a4-canvas::after {
+    transform: translate(8mm, 8mm);
+    box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+}
+
+.a4-canvas,
+.a4-canvas::before,
+.a4-canvas::after {
+    border-radius: 1px;
+}
+.a4-canvas::before {
+    background: #faf9f4;
+}
+
+.a4-canvas::after {
+    background: #f6f4ee;
+}
+
+        </style>
+
+
+    </head>
+    <body>
+        <div class="edit-toolbar">
+            <div>
+                <button class="btn btn-sm btn-success" id="saveLayout">
+                    <i class="bi bi-save"></i> Sauvegarder
+                </button>
+                <button class="btn btn-sm btn-secondary" id="resetLayout">
+                    <i class="bi bi-arrow-clockwise"></i> Réinitialiser
+                </button>
+            </div>
+            <div class="page-counter">
+                Page <span id="currentPage">1</span> / <span id="totalPages">1</span>
+            </div>
+        </div>
+        <section class="step-desc">
+            {% include "step_pdf_description.html"  %}
+        </section>
+    
+        <section class="step-media">
+            {% include "step_pdf_medias.html"%}
+        </section>
+        
+
+    </body>
+
+
+<div class="navig">
+    {% if step.previous_id_step %}
+    <a href="{% url 'step_preview' step.previous_id_step %}"><i class="bi bi-arrow-left"></i> Précédent</a>
+    {% endif %}
+    {% if step.next_id_step %}
+    <a href="{% url 'step_preview' step.next_id_step %}">Suivant <i class="bi bi-arrow-right"></i></a>
+    {% endif %}
+</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/interactjs@1.10.19/dist/interact.min.js"></script>
+    
+
+    <script>
+document.getElementById('saveLayout').addEventListener('click', function() {
+            const fullDoc = document.getElementsByTagName("html")[0];
+            fetch("http://127.0.0.1:8000/api/book_layout/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": getCookie('csrftoken')
+                },
+                body: JSON.stringify({
+                    "html": "",
+                    "html": fullDoc.innerHTML,
+                    "step": stepId
+                })
+            });
+
+
+        });
+
+        document.getElementById('resetLayout').addEventListener('click', function() {
+            if (confirm('Réinitialiser la mise en page ?')) {
+  
+            }
+        });
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }    
+            return cookieValue;
+        }
+
+
+        const stepId = {{step.id}}; 
+        const totalPages = document.querySelectorAll('.a4-canvas').length;
+        document.getElementById('totalPages').textContent = totalPages;
+
+       
+
+        function dragMoveListener(event) {            
+            const target = event.target;
+            const x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
+            const y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+
+            target.style.transform = `translate(${x}px, ${y}px)`;
+            target.setAttribute('data-x', x);
+            target.setAttribute('data-y', y);
+            
+        }
+
+        interact('.draggable').draggable({
+            listeners: { move: dragMoveListener },
+            onstart: function(event) {
+                event.target.classList.add('dragging');
+            },
+            onend: function(event) {
+                event.target.classList.remove('dragging');
+            }
+        });
+
+        interact('.resizable').resizable({
+            edges: { right: true, bottom: true },
+            listeners: {
+                move(event) {
+                    const target = event.target;
+                    let x = parseFloat(target.getAttribute('data-x')) || 0;
+                    let y = parseFloat(target.getAttribute('data-y')) || 0;
+
+                    target.style.width = event.rect.width + 'px';
+                    target.style.height = event.rect.height + 'px';
+
+                    x += event.deltaRect.left;
+                    y += event.deltaRect.top;
+
+                    target.style.transform = `translate(${x}px, ${y}px)`;
+                    target.setAttribute('data-x', x);
+                    target.setAttribute('data-y', y);
+                    
+                }
+            },
+            modifiers: [
+                interact.modifiers.restrictSize({
+                    min: { width: 100, height: 100 }
+                })
+            ],
+            onstart: function(event) {
+                event.target.classList.add('resizing');
+            },
+            onend: function(event) {
+                event.target.classList.remove('resizing');
+            }
+        });
+    </script>
+
+</html>

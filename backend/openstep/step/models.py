@@ -39,6 +39,18 @@ class Travel(models.Model):
         return self.name
 
 
+class BookLayout(models.Model):
+    html = models.TextField(blank=True)
+    primary_color = models.CharField(default="#e28b28")
+    travel_zoom_level = models.IntegerField(default=6)
+    step_zoom_level = models.IntegerField(default=7)
+    travel = models.OneToOneField(
+        Travel,
+        on_delete=models.CASCADE,
+        related_name="book_layout",
+    )
+
+
 # HACK to have
 class DateTimeWithoutTZField(DateTimeField):
     def db_type(self, connection):
@@ -108,7 +120,7 @@ class Step(models.Model):
         return self.medias.first()
 
 
-class BookLayout(models.Model):
+class StepBookLayout(models.Model):
     html = models.TextField(blank=True)
     step = models.OneToOneField(
         Step,

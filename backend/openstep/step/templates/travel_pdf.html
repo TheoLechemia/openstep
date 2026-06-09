@@ -3,6 +3,71 @@
 <head>
     <meta charset="utf-8">
     <style>
+
+    /* FIRST PAGE  */
+
+    .cover-page {
+    position: relative;
+    width: 297mm;
+    height: 210mm;
+    overflow: hidden;
+    }
+
+    /* Image plein cadre */
+    .cover-image img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    /* Voile pour lisibilité */
+    .cover-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+            to bottom,
+            rgba(0, 0, 0, 0.199),
+            rgba(0, 0, 0, 0.199),
+        );
+    }
+
+    /* Contenu centré */
+    .cover-content {
+        position: relative;
+        z-index: 2;
+        height: 100%;
+        display: table;
+        width: 100%;
+        text-align: center;
+        color: white;
+    }
+
+    .cover-content > * {
+        display: table-cell;
+        vertical-align: middle;
+    }
+
+    /* Titre */
+    .cover-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 3.2rem;
+        font-weight: 700;
+        letter-spacing: 2px;
+        margin-bottom: 1rem;
+        text-transform: uppercase;
+    }
+
+    /* Description */
+    .cover-description {
+        font-family: 'Lato', sans-serif;
+        font-size: 1.1rem;
+        max-width: 60%;
+        margin: 0 auto;
+        line-height: 1.6;
+        opacity: 0.9;
+    }
         @page {
             size: A4 landscape;
             margin: 0;
@@ -15,140 +80,69 @@
         .step-media {
             break-before: right;
         }
+
+        .a4-canvas {
+            width: 297mm;
+            height: 210mm;
+            background: white;
+            margin: 0 auto 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
     </style>
 </head>
 <body>
 
-    <div class="edit-toolbar">
-        <div>
-            <button class="btn btn-sm btn-success" id="saveLayout">
-                <i class="bi bi-save"></i> Sauvegarder
-            </button>
-            <button class="btn btn-sm btn-secondary" id="resetLayout">
-                <i class="bi bi-arrow-clockwise"></i> Réinitialiser
-            </button>
+
+
+    <div class="a4-canvas cover-page">
+        <div class="cover-image">
+            <img src="{{ travel.main_photo.url }}" alt="">
         </div>
-        <div class="page-counter">
-            Page <span id="currentPage">1</span> / <span id="totalPages">1</span>
+
+        <div class="cover-overlay"></div>
+
+        <div class="cover-content">
+            <h1 class="cover-title">{{ travel.name }}</h1>
+            <p class="cover-description">{{ travel.description }}</p>
         </div>
     </div>
 
+    <div class="a4-canvas">
+        <img src="{{travel_map}}" alt="">
+    </div>
+
+
+
 {% for s in steps %}
 
-    <section class="step-desc">
-        {% include "step_pdf_description.html" with step=s.step map_url=s.map_url %}
-    </section>
+    {% if s.has_custom_layout %}
+        {{s.step.book_layout.html|safe}}
+    {% else %}
 
-    <section class="step-media">
-        {% include "step_pdf_medias.html" with step=s.step media_with_cols=s.media_with_cols %}
-    </section>
+        <section class="step-desc">
+            {% include "step_pdf_description.html" with step=s.step map_url=s.map_url %}
+        </section>
+
+        <section class="step-media">
+            {% include "step_pdf_medias.html" with step=s.step media_with_cols=s.media_with_cols %}
+        </section>
+
+    {% endif %}
 
 {% endfor %}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/interactjs@1.10.19/dist/interact.min.js"></script>
     
 <script>
-    document.getElementById('saveLayout').addEventListener('click', function() {
-            const fullDoc = document.getElementsByTagName("html")[0];
-            fetch("http://127.0.0.1:8000/api/book_layout/", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRFToken": getCookie('csrftoken')
-                },
-                body: JSON.stringify({
-                    "html": fullDoc.innerHTML,
-                    "travel": travelId
-                })
-            });
+    
 
 
-        });
 
-        document.getElementById('resetLayout').addEventListener('click', function() {
-            if (confirm('Réinitialiser la mise en page ?')) {
-  
-            }
-        });
-
-                function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }    
-            return cookieValue;
-        }
-
-        const travelId = {{travel.id}}; 
-        const totalPages = document.querySelectorAll('.a4-canvas').length;
-        document.getElementById('totalPages').textContent = totalPages;
-
-       
-
-        function dragMoveListener(event) {            
-            const target = event.target;
-            const x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
-            const y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
-
-            target.style.transform = `translate(${x}px, ${y}px)`;
-            target.setAttribute('data-x', x);
-            target.setAttribute('data-y', y);
-            
-        }
-
-        interact('.draggable').draggable({
-            listeners: { move: dragMoveListener },
-            onstart: function(event) {
-                event.target.classList.add('dragging');
-            },
-            onend: function(event) {
-                event.target.classList.remove('dragging');
-            }
-        });
-
-        interact('.resizable').resizable({
-            edges: { right: true, bottom: true },
-            listeners: {
-                move(event) {
-                    console.log("move");
-                    
-                    const target = event.target;
-                    let x = parseFloat(target.getAttribute('data-x')) || 0;
-                    let y = parseFloat(target.getAttribute('data-y')) || 0;
-
-                    target.style.width = event.rect.width + 'px';
-                    target.style.height = event.rect.height + 'px';
-
-                    x += event.deltaRect.left;
-                    y += event.deltaRect.top;
-
-                    target.style.transform = `translate(${x}px, ${y}px)`;
-                    target.setAttribute('data-x', x);
-                    target.setAttribute('data-y', y);
-                    
-                }
-            },
-            modifiers: [
-                interact.modifiers.restrictSize({
-                    min: { width: 100, height: 100 }
-                })
-            ],
-            onstart: function(event) {
-                console.log("start");
-                event.target.classList.add('resizing');
-            },
-            onend: function(event) {
-                console.log("end");
-                event.target.classList.remove('resizing');
-            }
-        });
 
         
 

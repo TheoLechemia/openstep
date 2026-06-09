@@ -11,15 +11,16 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400&display=swap" rel="stylesheet">
+
     <style>
         :root {
             --primary-color: #2C3E50;
-            --accent-color: #E8B4B8;
+            /* --accent-color: #E8B4B8; */
+            --accent-color: #e28b28;
             --text-color: #4A4A4A;
             --light-bg: #FAF9F6;
         }
-        
+
         * {
             margin: 0;
             padding: 0;
@@ -33,16 +34,7 @@
             font-size: 10pt;
         }
 
-        /* Canvas A4 en paysage */
-        .a4-canvas {
-            width: 297mm;
-            height: 210mm;
-            background: white;
-            margin: 0 auto 40px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-            position: relative;
-            overflow: hidden;
-        }
+
 
         @page {
             size: A4 landscape;
@@ -55,10 +47,16 @@
             font-weight: 600;
         }
         
+        
         /* Hero Section */
         .hero-section {
-            text-align: center;
+            text-align: left;
+            margin-bottom: 18px;
+            padding-bottom: 10px;
+            padding-top: 10px;
+            border-bottom: 1px solid #eee;
         }
+        
         
 
 
@@ -76,18 +74,22 @@
         }
 
         .hero-title {
-            font-size: 1.8rem;
+            /* font-size: 1.8rem; */
             font-weight: 700;
             margin-bottom: 5px;
             color: var(--primary-color);
             line-height: 1.2;
+            font-size: 2.2rem;
+            letter-spacing: -0.5px;
         }
 
         .hero-location {
-            font-size: 0.95rem;
+            /* font-size: 0.95rem; */
             font-weight: 300;
             letter-spacing: 1px;
             color: var(--text-color);
+            font-size: 0.85rem;
+            color: #777;
         }
         .page-table {
             display: table;
@@ -115,30 +117,31 @@
             width: 34%;
             text-align: center;
         }
-
-
-
-   
-
         #img_map {
-            width: 100%;
+        width: 100%;
             object-fit: cover;
-        }
+}
 
-            
 
         .description-block {
-            margin: 5px;
-            font-size: 0.85rem;
-            line-height: 1.4;
-            color: var(--text-color);
+
+
+            background: none;
+            border: none;
+            padding: 0;
             column-count: 2;
-            column-gap: 1.5rem;
-            padding: 15px;
-            background-color: #fafafa;
-            border-radius: 5px;
-            border: solid #00000026 1px;
+            column-gap: 1.8rem;
+            font-size: 0.9rem;
         }
+
+        .dropcap {
+    float: left;
+    font-family: 'Playfair Display', serif;
+    font-size: 3.2rem;
+    line-height: 0.9;
+    margin: 0.05em 0.08em 0 0;
+    color: var(--accent-color);
+}
 
         .description-block p {
             margin-bottom: 0.5rem;
@@ -163,6 +166,8 @@
             font-style: italic;
             position: relative;
             z-index: 1;
+                /* font-family: 'Playfair Display', serif; */
+
         }
 
         /* Divider */
@@ -178,17 +183,22 @@
             background: var(--accent-color);
         }
 
-        .divider-dot {
-            display: inline-block;
-            width: 4px;
-            height: 4px;
-            background: var(--accent-color);
-            border-radius: 50%;
-            margin: 0 15px;
-            vertical-align: middle;
-        }
 
-        .comment-item {
+
+.divider-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background-color: white;
+    border: 1px solid var(--accent-color);
+    color: var(--accent-color);
+    font-size: 0.7rem;
+}
+
+   .comment-item {
             background: white;
             padding: 5px;
             margin-bottom: 0.5rem;
@@ -239,7 +249,9 @@
                 {% if step.comments.all %}
                 <div class="divider">
                     <span class="divider-line"></span>
-                    <span class="divider-dot"></span>
+                    <span class="divider-icon">
+                        <i class="bi bi-pencil"></i>
+                    </span>
                     <span class="divider-line"></span>
                 </div>
 
@@ -264,9 +276,6 @@
         </div>
     </div>
 
-{% if context.step_page %}
-    {% include "step_pdf_medias.html" with step=s.step media_with_cols=s.media_with_cols %}
-{% endif %}
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

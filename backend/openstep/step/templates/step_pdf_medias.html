@@ -14,7 +14,8 @@
     <style>
         :root {
             --primary-color: #2C3E50;
-            --accent-color: #E8B4B8;
+            /* --accent-color: #E8B4B8; */
+            --accent-color: #e28b28;
             --text-color: #4A4A4A;
             --light-bg: #FAF9F6;
         }
@@ -36,35 +37,8 @@
             font-weight: 600;
         }
 
-        /* Canvas A4 en paysage */
-        .a4-canvas {
-            width: 297mm;
-            height: 210mm;
-            background: white;
-            margin: 0 auto 40px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-            position: relative;
-            overflow: hidden;
-        }
 
-        .a4-canvas {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
 
-        .a4-canvas::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            border: 3px dashed #ff4444;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
 
 
         @keyframes pulse {
@@ -226,6 +200,7 @@
         .page-other-medias {
             padding: 5px;
         }
+
     
 
         @media print {
@@ -260,9 +235,6 @@
     </style>
 </head>
 <body>
-{% if context.step_page %}
-    {% include "step_pdf_medias.html" with step=s.step media_with_cols=s.media_with_cols %}
-{% endif %}
 
 
     {% if step.first_media %}

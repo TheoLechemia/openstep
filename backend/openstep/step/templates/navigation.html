@@ -25,9 +25,9 @@
 
 <div class="navig">
     {% if step.previous_id_step %}
-    <a href="{% url 'step_medias' step.previous_id_step %}"><i class="bi bi-arrow-left"></i> Précédent</a>
+    <a href="{% url 'step_desc' step.previous_id_step %}"><i class="bi bi-arrow-left"></i> Précédent</a>
     {% endif %}
     {% if step.next_id_step %}
-    <a href="{% url 'step_medias' step.next_id_step %}">Suivant <i class="bi bi-arrow-right"></i></a>
+    <a href="{% url 'step_desc' step.next_id_step %}">Suivant <i class="bi bi-arrow-right"></i></a>
     {% endif %}
 </div>

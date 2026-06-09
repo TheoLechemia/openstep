@@ -12,3 +12,4 @@ django-resized
 pillow
 staticmap
 django-weasyprint
+beautifulsoup4
