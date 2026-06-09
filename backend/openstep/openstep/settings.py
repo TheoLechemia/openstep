@@ -155,4 +155,6 @@ REST_FRAMEWORK = {
 
 }
 
+MAX_VIDEO_SIZE = 50 * 1024 * 1024  # 50 Mo
+
 from .config import *

@@ -5,6 +5,7 @@ from django.contrib.gis.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator
+from django.conf import settings
 from django.db.models import DateTimeField, Q
 from django.utils.translation import gettext_lazy as _
 from django.utils.timezone import now
@@ -12,14 +13,13 @@ from django.utils.timezone import now
 from django_resized import ResizedImageField
 
 
-MAX_VIDEO_SIZE = 50 * 1024 * 1024  # 50 Mo
 
 
 def validate_video_size(value):
-    if value.size > MAX_VIDEO_SIZE:
+    if value.size > settings.MAX_VIDEO_SIZE:
         raise ValidationError(
             _("Fichier vidéo trop volumineux ( > %(limit)d Mo ).")
-            % {"limit": MAX_VIDEO_SIZE // (1024 * 1024)}
+            % {"limit": settings.MAX_VIDEO_SIZE // (1024 * 1024)}
         )
 
 from geopy.geocoders import Nominatim
