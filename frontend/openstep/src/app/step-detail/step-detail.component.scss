@@ -130,3 +130,27 @@
 //     right: 5%;
 //     animation: horizontal-shaking 1.5s 1s;
 // }
+
+// Les contrôles prev/suivant du carousel recouvrent toute la hauteur du slide
+// et captent les clics destinés à la barre de lecture vidéo. On rend la zone
+// transparente aux clics, et on ne laisse cliquable que l'icône (le chevron),
+// qui est centrée et ne chevauche pas la barre de contrôles vidéo en bas.
+::ng-deep carousel {
+    .carousel-control-prev,
+    .carousel-control-next {
+        pointer-events: none;
+        opacity: 1; // Bootstrap les met à 0.5 par défaut, trop pâles.
+    }
+    .carousel-control-prev-icon,
+    .carousel-control-next-icon {
+        pointer-events: auto;
+        // Pastille foncée derrière le chevron pour qu'il reste lisible sur
+        // une photo claire comme sur une photo sombre.
+        width: 2.5rem;
+        height: 2.5rem;
+        background-color: rgba(0, 0, 0, 0.45);
+        border-radius: 50%;
+        background-size: 50% 50%; // garde le chevron centré dans la pastille
+        cursor: pointer;
+    }
+}
