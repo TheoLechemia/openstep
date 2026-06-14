@@ -11,19 +11,8 @@
                 <a [routerLink]="['/travel', travelService.travel?.id]">
                      <small class="me-2 p-2 mt-2 primary-color">  {{travelService.travel?.name}} </small>
                 </a>
-
-                <!-- <mat-icon class="swipe-icon">swipe</mat-icon> -->
-
             </div>
-            <!-- <swiper-container
-                #swiperRef
-                init="false"
-                id="caroussel-container"
-                class="mySwiper"
-            > -->
-                <!-- @for (step of steps; track step.id; let i = $index) { -->
 
-                    <!-- <swiper-slide> -->
                     @if(step) {
 
                         <div class="description-padding head-step">
@@ -48,9 +37,14 @@
                             <p style="display: none;">medias</p>
                         </div>
                         <!-- No loop no working... -->
-                        <carousel [interval]="1500000000">
+                        <carousel class="caroussel" [interval]="1500000000">
                             @for(media of step.properties.medias; track media.id) {
                                 <slide style="cursor: pointer;">
+                                    @if(media.caption) {
+                                        <div class="caption">
+                                            {{media.caption}}
+                                        </div>
+                                    }
                                     @if (media.media_type === 'video') {
                                         <video [src]="media.src" controls style="display: block; width: 100%;"></video>
                                     } @else {
@@ -98,11 +92,6 @@
                     } @else {
                         <mat-spinner class="center"></mat-spinner>
                     }
-
-                    <!-- </swiper-slide> -->
-
-                <!-- } -->
-            <!-- </swiper-container> -->
         </div>
 
 
