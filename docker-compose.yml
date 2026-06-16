@@ -1,0 +1,79 @@
+# =============================================================================
+#  docker-compose.yml  —  shared base configuration
+#
+#  Do NOT use this file on its own.
+#  Use one of:
+#    docker compose -f docker-compose.yml -f docker-compose.dev.yml  up   # dev
+#    docker compose -f docker-compose.yml -f docker-compose.prod.yml up   # prod
+# =============================================================================
+
+services:
+  # ── PostgreSQL + PostGIS ───────────────────────────────────────────────────
+  db:
+    image: postgis/postgis:16-3.4
+    environment:
+      POSTGRES_DB: ${DB_NAME:-openstepdb}
+      POSTGRES_USER: ${DB_USER:-openstep}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - openstep-net
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${DB_USER:-openstep} -d ${DB_NAME:-openstepdb}",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # ── Django / Gunicorn backend ──────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+    env_file: .env
+    # Image used when pulling from the registry (prod) or tagging a local build.
+    # Override with BACKEND_IMAGE env var or set TAG for a specific release.
+    image: ${BACKEND_IMAGE:-ghcr.io/${GITHUB_REPOSITORY:-owner/openstep}-backend:${TAG:-latest}}
+    volumes:
+      # User-uploaded files shared with the frontend nginx for serving
+      - media_data:/app/assets
+      # Collected Django static files shared with the frontend nginx
+      - static_data:/app/staticfiles
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - openstep-net
+
+  # ── Angular frontend (nginx in prod / ng serve in dev) ────────────────────
+  frontend:
+    build:
+      context: ./frontend/openstep
+      target: ${APP_ENVIRONMENT:-production} #
+    image: ${FRONTEND_IMAGE:-ghcr.io/${GITHUB_REPOSITORY:-owner/openstep}-frontend:${TAG:-latest}}
+    environment:
+      APP_ENVIRONMENT: ${APP_ENVIRONMENT:-production}
+      API_ENDPOINT: ${API_ENDPOINT:-/api}
+      APP_NAME: ${APP_NAME:-OpenStep}
+    volumes:
+      # Serve Django static & media files via the nginx container (prod only)
+      - static_data:/usr/share/nginx/html/static:ro
+      - media_data:/usr/share/nginx/html/media:ro
+    depends_on:
+      - backend
+    networks:
+      - openstep-net
+
+# ── Named volumes ──────────────────────────────────────────────────────────
+volumes:
+  postgres_data:
+  media_data:
+  static_data:
+
+# ── Networks ────────────────────────────────────────────────────────────────
+networks:
+  openstep-net:
+    driver: bridge

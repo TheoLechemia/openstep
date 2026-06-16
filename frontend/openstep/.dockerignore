@@ -1,0 +1,18 @@
+# Build output
+dist/
+.angular/
+
+# Dependencies
+node_modules/
+
+# Local runtime config — generated at container startup from env vars
+src/config/config.json
+
+# Version control & IDE
+.git
+.gitignore
+.vscode
+.env*
+
+# Docs / CI
+*.md

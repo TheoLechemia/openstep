@@ -1,0 +1,77 @@
+# =============================================================================
+#  docker-compose.prod.yml  —  production overrides
+#
+#  Usage:
+#    docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+#
+#  Prerequisites:
+#    - Copy .env.example to .env and fill in all required variables
+#    - DOMAIN and TRAEFIK_ACME_EMAIL must be set in .env
+#    - Ensure ports 80 and 443 are open on the host
+#
+#  What changes vs. base:
+#    - Traefik handles HTTPS with Let's Encrypt (ACME HTTP challenge)
+#    - All HTTP traffic is redirected to HTTPS
+#    - Backend and frontend have Traefik labels scoped to DOMAIN
+#    - All services have restart: unless-stopped
+#    - Traefik dashboard is NOT exposed
+# =============================================================================
+
+services:
+  db:
+    restart: unless-stopped
+
+  backend:
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      # Route API, admin, and tinymce to the backend.
+      # Static & media files are served by the frontend nginx via mounted volumes.
+      - "traefik.http.routers.backend.rule=Host(`${DOMAIN}`) && (PathPrefix(`/api`) || PathPrefix(`/admin`) || PathPrefix(`/tinymce`))"
+      - "traefik.http.routers.backend.entrypoints=websecure"
+      - "traefik.http.routers.backend.tls=true"
+      - "traefik.http.routers.backend.tls.certresolver=letsencrypt"
+      - "traefik.http.services.backend.loadbalancer.server.port=8000"
+
+  frontend:
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      # Catch-all router for the frontend (Angular SPA + /static/ + /media/)
+      - "traefik.http.routers.frontend.rule=Host(`${DOMAIN}`)"
+      - "traefik.http.routers.frontend.entrypoints=websecure"
+      - "traefik.http.routers.frontend.tls=true"
+      - "traefik.http.routers.frontend.tls.certresolver=letsencrypt"
+      - "traefik.http.services.frontend.loadbalancer.server.port=80"
+
+  traefik:
+    image: traefik:v3.1
+
+    restart: unless-stopped
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      # HTTP entrypoint — only used for the Let's Encrypt HTTP challenge redirect
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      - "--entrypoints.web.http.redirections.entrypoint.permanent=true"
+      # HTTPS entrypoint
+      - "--entrypoints.websecure.address=:443"
+      # Let's Encrypt ACME (HTTP-01 challenge)
+      - "--certificatesresolvers.letsencrypt.acme.email=${TRAEFIK_ACME_EMAIL:?TRAEFIK_ACME_EMAIL is required}"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+      - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
+      # Uncomment for Let's Encrypt staging (avoid rate limits while testing):
+      # - "--certificatesresolvers.letsencrypt.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - letsencrypt:/letsencrypt
+    networks:
+      - openstep-net
+
+volumes:
+  letsencrypt:

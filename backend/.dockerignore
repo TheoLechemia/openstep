@@ -1,0 +1,27 @@
+# Python cache
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Generated config — never ship secrets inside the image
+openstep/openstep/config.py
+
+# User-uploaded media files — mounted as a volume at runtime
+openstep/assets/
+
+# Node artefacts from the tinymce/MDB install
+openstep/node_modules/
+openstep/package-lock.json
+
+# Version control & IDE
+.git
+.gitignore
+.vscode
+.env*
+
+# Test / CI artefacts
+*.sqlite3
+.coverage
+htmlcov/

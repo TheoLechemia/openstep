@@ -10,12 +10,17 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 import os
+import environ
 
 from pathlib import Path
 
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+PROJECT_BASE_DIR = BASE_DIR.parent.parent.parent
+
+env = environ.Env()
+environ.Env.read_env(os.path.join(PROJECT_BASE_DIR, '.env'))
+
 
 
 # Quick-start development settings - unsuitable for production
@@ -23,14 +28,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-d0()zfpxy0w(6fj0(nx+*q2h40elii*(!ex^+!z&p8_^4+ne6m'
-
+SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
-MEDIA_ROOT = BASE_DIR / "assets"
 # Application definition
 
 INSTALLED_APPS = [
@@ -129,11 +132,8 @@ USE_TZ = False
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 
-STATIC_ROOT = ''
-
 STATIC_URL = '/static/'
 
-STATICFILES_DIRS = ('static',)
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -157,4 +157,20 @@ REST_FRAMEWORK = {
 
 MAX_VIDEO_SIZE = 50 * 1024 * 1024  # 50 Mo
 
-from .config import *
+DATABASES = {
+    "default": {
+        "ENGINE": "django.contrib.gis.db.backends.postgis",
+        'NAME': os.environ.get('DB_NAME', 'openstepdb'),
+        'USER': os.environ.get('DB_USER', 'geonatadmin'),
+        'PASSWORD': os.environ['DB_PASSWORD'],
+        'HOST': os.environ.get('DB_HOST', 'localhost'),
+        'PORT': os.environ.get('DB_PORT', '5432'),
+    }
+}
+
+STATIC_URL = "/static/" 
+
+# Point MEDIA_ROOT to the directory where uploaded media are stored.
+# The project currently keeps files in the assets folder, reuse it for MEDIA_ROOT.
+MEDIA_ROOT = BASE_DIR.parent / "assets"
+STATIC_ROOT = BASE_DIR.parent / "staticfiles"
