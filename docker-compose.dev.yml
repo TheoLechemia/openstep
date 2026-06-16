@@ -1,0 +1,40 @@
+# =============================================================================
+#  docker-compose.dev.yml  —  development overrides
+#
+#  Usage:
+#    docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+#
+#  What changes vs. base:
+#    - Backend runs Django dev server with source-code volume (hot reload)
+#    - Frontend runs ng serve with source-code volume (hot reload)
+#    - DJANGO_DEBUG=True so Django serves static & media files itself
+#    - Traefik routes /static/ and /media/ to the backend in dev
+#    - Traefik dashboard is exposed on port 8080
+#    - Static/media volumes are NOT mounted on the frontend (Django handles them)
+# =============================================================================
+
+services:
+  backend:
+    build:
+      context: ./backend
+    # Mount source code for live reload (Django dev server watches for changes)
+    volumes:
+      - ./backend/openstep:/app
+      # Keep named volumes for media/static so they persist across restarts
+      - media_data:/app/assets
+      - static_data:/app/staticfiles
+    # Use Django dev server instead of gunicorn
+    command: ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+    ports:
+      - "${DJANGO_PORT}:8000"
+
+  frontend:
+    build:
+      context: ./frontend/openstep
+      # Use the 'dev' stage: node image running ng serve
+      target: dev
+    ports:
+      - "${FRONTEND_PORT}:4200"
+    # Mount source for hot reload; keep node_modules inside the container
+    volumes:
+      - ./frontend/openstep:/app

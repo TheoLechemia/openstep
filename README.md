@@ -4,6 +4,7 @@ Openstep is an opensource self-hosted travel book application.
 It is a good opensource alternative of the wellknown PolarStep app.
 
 Openstep is made of three main parts :
+
 - a simple django-admin backoffice to create travels, steps, users and permissions
 - an API provided by Django-Rest-Framework
 - an Angular frontend to display travels and step is a public web page
@@ -24,54 +25,19 @@ Backoffice screenshots :
 
 ![Capture d’écran du 2025-06-21 13-08-04](https://github.com/user-attachments/assets/7e58bf0a-de9b-4b47-ad40-aa53095b3f07)
 
-## Developpemnt
+## Deploy
 
+Docker is use to deploy the application (dev or prod).
+Copy and fill the .env.sample file
 
-Openstep frontend is a Angular app.
-First install the app dependencies :
+Build and run the with docker :
 
-    cd frontend/openstep
-    npm install
+    docker compose up --build
 
-Launch the dev server :
+Create a django superuser :
 
-    npm run start
+    docker compose run backend ./manage.py createsuperuser
 
-#### Backend
+That's it !
 
-The API and the backoffice are made with django. It uses GeoDjango, so a
-PostGIS database is required.
-
-Install the system dependencies first (Debian/Ubuntu): PostgreSQL + PostGIS
-server-side, and GDAL/GEOS at runtime for GeoDjango:
-
-    sudo apt install postgresql postgis gdal-bin libgdal-dev
-
-Install backend dependencies:
-
-    cd backend
-    python3 -m venv venv
-    source venv/bin/activate
-    pip install -r requirements.txt
-
-Create the configuration from the sample and adjust it if needed (database
-credentials, allowed hosts, ...):
-
-    cp openstep/openstep/config.py.sample openstep/openstep/config.py
-
-Create the PostGIS database, role and extension. The script reads the
-credentials straight from your `config.py`, so the role always matches what the
-app expects:
-
-    sudo -u postgres ./scripts/create_db.sh
-
-Apply migrations and create an admin user for the backoffice:
-
-    cd openstep
-    python manage.py migrate
-    python manage.py createsuperuser
-
-Run dev server:
-
-    python manage.py runserver
-
+⚠️ the prod deployment has not been tested yet

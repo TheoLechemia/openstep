@@ -1,4 +1,4 @@
-config.py
+local.py
 
 **/assets/*
 # Byte-compiled / optimized / DLL files
@@ -143,6 +143,7 @@ venv.bak/
 /site
 
 **/static/*
+**/staticfiles/*
 
 **/.vscode
 
