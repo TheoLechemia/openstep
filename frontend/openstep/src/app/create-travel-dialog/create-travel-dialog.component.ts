@@ -56,7 +56,7 @@ export class CreateTravelDialogComponent {
 
   submit(): void {
     if (!this.name || !this.startDate || !this.photo) {
-      this.error = 'Nom, date de début et photo sont obligatoires.';
+      this.error = 'Name, start date and media are mandatory.';
       return;
     }
     this.loading = true;

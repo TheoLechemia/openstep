@@ -1,9 +1,6 @@
  <mat-toolbar>
     <span id="app-name" routerLink=""> {{appName}} </span>
     <span class="example-spacer"></span>
-    <button (click)="openDialog()" mat-icon-button aria-label="Infos">
-      <mat-icon>info</mat-icon>
-    </button>
 
     @if (auth.user$ | async; as user) {
       <!-- Logged-in: avatar + dropdown -->
@@ -27,6 +24,9 @@
         <mat-icon>account_circle</mat-icon>
       </button>
     }
+    <button (click)="openDialog()" mat-icon-button aria-label="Infos" class="icon-btn">
+      <mat-icon>info</mat-icon>
+    </button>
   </mat-toolbar>
 
   

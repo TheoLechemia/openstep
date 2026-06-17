@@ -28,8 +28,8 @@
 
     @for (step of nonPositionelSteps; track step.id) {
         <swiper-slide class="height-100 ">
-            <mat-card class="step-card height-100 width-100" [class.card-unpublished]="!step.properties.published">
-                <img class="step-img" (click)="goToDetail(step.id)" #img mat-card-image src="{{step.properties.first_image?.src}}" alt="">
+            <mat-card class="step-card height-100 width-100" [class.card-unpublished]="!step.properties.published" >
+                <img class="step-img"  (click)="goToDetail(step.id)" #img mat-card-image src="{{step.properties.first_image?.src}}" alt="">
                 <div class="float-info">
                     <div (click)="goToDetail(step.id)"  class="info-overlay">
                         <h4> {{step.properties.name}} </h4>
@@ -38,7 +38,7 @@
                     </div>
                 </div>
 
-                <mat-card-actions>
+                <mat-card-actions [class.card-unpublished]="!step.properties.published" class="card-action">
                     <span id="nb-comments" class="me-4 size">
                         <mat-icon [inline]="true">chat</mat-icon> <span class="text-muted"> {{step.properties.comments.length}} </span> 
                     </span>

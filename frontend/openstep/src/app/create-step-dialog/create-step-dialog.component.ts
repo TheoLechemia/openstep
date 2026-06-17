@@ -168,13 +168,14 @@ export class CreateStepDialogComponent implements AfterViewInit, OnDestroy, OnIn
         name: this.name,
         date: this.date.toISOString().split('T')[0] + 'T12:00:00',
         description: this.description,
-          published: this.published,
+        published: this.published,
         travel: this.data.travelId,
         positional_step: this.positionalStep,
       },
     };
     if (this.isEdit && this.data?.step) {
       // Update existing step
+      
       this._api.updateStep(this.data.step.id, geojson).subscribe({
         next: (step) => {
           const stepId = step.id;

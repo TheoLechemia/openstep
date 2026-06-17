@@ -78,7 +78,7 @@ class StepWriteSerializer(gis_serializers.GeoFeatureModelSerializer):
     """Minimal serializer used for step creation / update."""
     class Meta:
         model = Step
-        fields = ('id', 'name', 'location', 'description', 'date', 'travel', 'positional_step')
+        fields = ('id', 'name', 'location', 'description', 'date', 'travel', 'positional_step', 'published')
         geo_field = "location"
 
 
