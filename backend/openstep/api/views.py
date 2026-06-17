@@ -7,7 +7,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated, SAFE_METHODS
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_gis import serializers as gis_serializers
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Q
 
 from step.models import Step, Travel, Media, Comments
 from api.permissions import TravelStepOwner, TravelOwner
@@ -222,9 +222,14 @@ class TravelViewSet(viewsets.ModelViewSet):
         # For retrieve view: prefetch steps, but for anonymous users only
         # include published steps.
         if self.action == 'retrieve':
+            # Anonymous users: only published steps.
             if not (self.request.user and self.request.user.is_authenticated):
                 return queryset.prefetch_related(Prefetch('steps', queryset=Step.objects.filter(published=True)))
-            return queryset.prefetch_related('steps')
+
+            # Authenticated users: include unpublished steps only for travels
+            # they own (otherwise only published steps).
+            steps_qs = Step.objects.filter(Q(published=True) | Q(travel__owners__id=self.request.user.id))
+            return queryset.prefetch_related(Prefetch('steps', queryset=steps_qs))
 
         return queryset
 
