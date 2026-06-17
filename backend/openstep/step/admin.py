@@ -66,7 +66,7 @@ class StepAdmin(GISModelAdmin):
     form = StepForm
     inlines = [MediaInline]
     list_display = ("name", "description", "image_preview",)
-    fields = ("travel", "positional_step", "name", "date", "location", "description")
+    fields = ("travel", "positional_step", "name", "date", "location", "description", "published")
 
     def get_queryset(self, request):
         travels = Travel.objects.get_authorized(request)

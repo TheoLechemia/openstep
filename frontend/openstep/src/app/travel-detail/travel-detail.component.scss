@@ -143,6 +143,10 @@ mar-card-actions {
 
 }
 
+.card-unpublished {
+    opacity: 0.5;
+}
+
 .add-step-card {
     cursor: pointer;
     border: 2px dashed rgba(0,0,0,0.2);

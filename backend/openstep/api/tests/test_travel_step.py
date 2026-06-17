@@ -2,7 +2,7 @@ import json
 import os
 import shutil
 import tempfile
-from datetime import date
+from datetime import date, datetime
 
 from django.test import TestCase, override_settings
 from django.conf import settings
@@ -14,6 +14,7 @@ from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import User
 
 from step.models import Travel, Step
+from django.contrib.gis.geos import Point
 
 
 TEST_MEDIA_ROOT = tempfile.mkdtemp(prefix="test_media_")
@@ -164,3 +165,28 @@ class TravelStepAPITest(TestCase):
         # We expect permission denied (403). Previously a filtered queryset
         # returned 404; we now prefer 403.
         self.assertIn(resp.status_code, (401, 403))
+
+    def test_cannot_add_media_on_unowned_step(self):
+        # ensure travel and its step are owned by self.user
+        self.travel.owners.add(self.user)
+        step = Step.objects.create(
+            name='StepMedia', date=datetime(2024, 1, 1, 12, 0), location=Point(2.0, 48.0), travel=self.travel
+        )
+
+        other_token = Token.objects.create(user=self.user_without_travel)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {other_token.key}')
+
+        img = SimpleUploadedFile('media.gif', GIF_BYTES, content_type='image/gif')
+        resp = self.client.post(f'/api/steps/{step.id}/medias/', {'image_file': img}, format='multipart')
+        self.assertEqual(resp.status_code, 403)
+
+    def test_anonymous_can_retrieve_public_travel(self):
+        # ensure travel is public
+        self.travel.is_public = True
+        self.travel.save()
+
+        # clear credentials to simulate anonymous request
+        self.client.credentials()  # remove any auth header
+        url = f'/api/travels/{self.travel.uuid}/'
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200, msg=resp.data)

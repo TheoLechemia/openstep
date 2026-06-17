@@ -7,6 +7,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated, SAFE_METHODS
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_gis import serializers as gis_serializers
+from django.db.models import Prefetch
 
 from step.models import Step, Travel, Media, Comments
 from api.permissions import TravelStepOwner, TravelOwner
@@ -68,7 +69,7 @@ class StepSerializer(gis_serializers.GeoFeatureModelSerializer):
         fields = (
             'travel', 'positional_step', 'comments', 'id', 'name', 'location',
             'description', 'date', 'medias', 'first_image', 'day_of_travel',
-            'country', 'state',
+            'country', 'state', 'published'
         )
         geo_field = "location"
 
@@ -157,7 +158,7 @@ class StepViewSet(viewsets.ModelViewSet):
         return StepSerializer
 
     def get_permissions(self):
-        if self.action in SAFE_METHODS:
+        if self.request.method in SAFE_METHODS:
             return [AllowAny()]
         # The add_media action is a multipart upload against an existing Step
         # and does not include a travel id in the request body. We rely on
@@ -184,9 +185,18 @@ class StepViewSet(viewsets.ModelViewSet):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+    def get_queryset(self):
+        qs = super().get_queryset()
+        if self.action == "list":
+            if self.request.user and self.request.user.is_authenticated:
+                return qs
+            return qs.filter(published=True)
+        return qs
 
 class TravelViewSet(viewsets.ModelViewSet):
-    queryset = Travel.objects.all().prefetch_related("steps")
+    # Do not prefetch steps at class level; get_queryset will decide when
+    # and how to prefetch (published-only for anonymous users).
+    queryset = Travel.objects.all()
     lookup_field = "uuid"
 
     def get_serializer_class(self):
@@ -195,15 +205,27 @@ class TravelViewSet(viewsets.ModelViewSet):
         return TravelSerializer
 
     def get_permissions(self):
-        if self.action in SAFE_METHODS:
+        if self.request.method in SAFE_METHODS:
             return [AllowAny()]
         else :
             return [IsAuthenticated(), TravelOwner()]
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        if self.action == "list":
-            queryset = queryset.filter(is_public=True)
+
+        # For list view: only show public travels. Also prefetch steps
+        # according to authentication (anonymous -> only published steps).
+        if self.action == 'list':
+            return queryset.filter(is_public=True)
+
+
+        # For retrieve view: prefetch steps, but for anonymous users only
+        # include published steps.
+        if self.action == 'retrieve':
+            if not (self.request.user and self.request.user.is_authenticated):
+                return queryset.prefetch_related(Prefetch('steps', queryset=Step.objects.filter(published=True)))
+            return queryset.prefetch_related('steps')
+
         return queryset
 
     def perform_create(self, serializer):
