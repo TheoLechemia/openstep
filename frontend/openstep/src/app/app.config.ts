@@ -5,22 +5,26 @@ import { provideRouter, withComponentInputBinding, withHashLocation } from '@ang
 
 import { routes } from './app.routes';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { ConfigService } from './config.service';
+import { AuthService } from './auth.service';
+import { authInterceptor } from './auth.interceptor';
+import { lastValueFrom } from 'rxjs';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }), 
     provideRouter(routes, withComponentInputBinding(), withHashLocation()), 
     provideAnimationsAsync(),
-    provideHttpClient(),
+    provideHttpClient(withInterceptors([authInterceptor])),
     {
       provide: APP_INITIALIZER,
       multi: true,
-      deps: [ConfigService],
-      useFactory: (configService: ConfigService) => {
-        return () => {
-          return configService.loadAppConfig();
+      deps: [ConfigService, AuthService],
+      useFactory: (configService: ConfigService, authService: AuthService) => {
+        return async () => {
+          await configService.loadAppConfig();
+          await lastValueFrom(authService.init());
         };
       },
     },

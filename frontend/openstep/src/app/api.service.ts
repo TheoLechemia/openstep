@@ -12,18 +12,32 @@ export class ApiService {
 
   getTravels(): Observable<any> {    
     return this._http.get<any>(`${this.configService.config.API_ENDPOINT}/travels/`).pipe(
-      map(resp => {
-        return resp["results"]
-      })
+      map(resp => resp["results"])
     )
   }
 
-  getTravel(uuidTravel:string): Observable<any> {
+  getMyTravels(): Observable<any[]> {
+    return this._http.get<any[]>(`${this.configService.config.API_ENDPOINT}/travels/mine/`);
+  }
+
+  getTravel(uuidTravel: string): Observable<any> {
     return this._http.get<any>(`${this.configService.config.API_ENDPOINT}/travels/${uuidTravel}/`)
   }
 
-  getStep(idStep:number): Observable<any> {
+  createTravel(data: FormData): Observable<any> {
+    return this._http.post<any>(`${this.configService.config.API_ENDPOINT}/travels/`, data);
+  }
+
+  getStep(idStep: number): Observable<any> {
     return this._http.get<any>(`${this.configService.config.API_ENDPOINT}/steps/${idStep}/`)
+  }
+
+  createStep(geojson: any): Observable<any> {
+    return this._http.post<any>(`${this.configService.config.API_ENDPOINT}/steps/`, geojson);
+  }
+
+  addMediaToStep(stepId: number, data: FormData): Observable<any> {
+    return this._http.post<any>(`${this.configService.config.API_ENDPOINT}/steps/${stepId}/medias/`, data);
   }
 
   postComment(data: any): Observable<any> {
@@ -31,3 +45,4 @@ export class ApiService {
       `${this.configService.config.API_ENDPOINT}/comments/`, data)
   }
 }
+

@@ -1,0 +1,92 @@
+<h2 mat-dialog-title>Nouvelle étape</h2>
+
+<mat-dialog-content>
+  <div class="form-columns">
+    <!-- Left: fields -->
+    <div class="fields-col">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Nom de l'étape</mat-label>
+        <input matInput [(ngModel)]="name" required>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Date</mat-label>
+        <input matInput [matDatepicker]="pickerDate" [(ngModel)]="date" required>
+        <mat-datepicker-toggle matSuffix [for]="pickerDate"></mat-datepicker-toggle>
+        <mat-datepicker #pickerDate></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Description</mat-label>
+        <textarea matInput [(ngModel)]="description" rows="4"></textarea>
+      </mat-form-field>
+
+      <mat-slide-toggle [(ngModel)]="positionalStep" class="mb-2">
+        Étape positionnelle (repère sans contenu)
+      </mat-slide-toggle>
+
+      <!-- Media upload -->
+      <div class="media-section">
+        <div class="media-header">
+          <span class="media-label">Photos / Vidéos</span>
+          <label class="add-media-btn">
+            <mat-icon>add_photo_alternate</mat-icon>
+            <input type="file" accept="image/*,video/mp4" multiple (change)="onMediaSelected($event)" hidden>
+          </label>
+        </div>
+
+        @if (mediaPreviews.length > 0) {
+          <div class="media-grid">
+            @for (preview of mediaPreviews; track $index) {
+              <div class="media-item">
+                @if (preview.isVideo) {
+                  <video [src]="preview.url" class="media-thumb"></video>
+                } @else {
+                  <img [src]="preview.url" class="media-thumb" alt="">
+                }
+                <input
+                  class="legend-input"
+                  [(ngModel)]="mediaLegends[$index]"
+                  placeholder="Légende"
+                  (click)="$event.stopPropagation()">
+                <button mat-icon-button class="remove-btn" (click)="removeMedia($index)">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Right: map -->
+    <div class="map-col">
+      <p class="map-hint">
+        <mat-icon inline>touch_app</mat-icon>
+        Cliquez sur la carte pour placer l'étape
+      </p>
+      <div #locationMap class="location-map"></div>
+      @if (selectedLat !== null) {
+        <p class="coords-info">
+          <mat-icon inline>location_on</mat-icon>
+          {{ selectedLat | number:'1.4-4' }}, {{ selectedLng | number:'1.4-4' }}
+        </p>
+      }
+    </div>
+  </div>
+
+  @if (error) {
+    <p class="error-msg">{{ error }}</p>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Annuler</button>
+  <button mat-flat-button [disabled]="loading" (click)="submit()">
+    @if (loading) {
+      <mat-progress-spinner diameter="20" mode="indeterminate"></mat-progress-spinner>
+    } @else {
+      Créer l'étape
+    }
+  </button>
+</mat-dialog-actions>

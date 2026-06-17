@@ -25,6 +25,7 @@
     class="mySwiper" 
     >
 
+
     @for (step of nonPositionelSteps; track step.id) {
         <swiper-slide class="height-100 ">
             <mat-card class="step-card height-100 width-100">
@@ -56,6 +57,16 @@
                     
             </mat-card>
         </swiper-slide>
+    }
+    @if (isOwner) {
+      <swiper-slide class="height-100">
+        <mat-card class="step-card height-100 width-100 add-step-card" (click)="openAddStep()">
+          <div class="add-step-inner">
+            <mat-icon class="add-step-icon">add_location_alt</mat-icon>
+            <span>Add a step</span>
+          </div>
+        </mat-card>
+      </swiper-slide>
     }
 
 

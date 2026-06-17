@@ -1,0 +1,141 @@
+mat-dialog-content {
+  max-width: 90vw;
+}
+
+.form-columns {
+  display: flex;
+  gap: 20px;
+  min-width: 600px;
+
+  @media (max-width: 700px) {
+    flex-direction: column;
+    min-width: unset;
+  }
+}
+
+.fields-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.map-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.full-width { width: 100%; }
+
+.location-map {
+  flex: 1;
+  min-height: 280px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(0,0,0,0.15);
+}
+
+.map-hint {
+  font-size: 0.8rem;
+  color: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0 0 4px 0;
+}
+
+.coords-info {
+  font-size: 0.78rem;
+  color: rgba(0,0,0,0.55);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin: 4px 0 0 0;
+}
+
+/* Media section */
+.media-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.media-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.media-label {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.add-media-btn {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.85rem;
+  border: 1px solid rgba(0,0,0,0.2);
+  border-radius: 20px;
+  padding: 4px 10px;
+  transition: background 0.15s;
+
+  &:hover { background: rgba(0,0,0,0.05); }
+}
+
+.media-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.media-item {
+  position: relative;
+  width: 90px;
+}
+
+.media-thumb {
+  width: 90px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 6px;
+  display: block;
+  background: #eee;
+}
+
+.legend-input {
+  width: 100%;
+  font-size: 0.7rem;
+  border: none;
+  border-bottom: 1px solid rgba(0,0,0,0.2);
+  background: transparent;
+  padding: 2px 0;
+  outline: none;
+  box-sizing: border-box;
+
+  &:focus { border-bottom-color: var(--mdc-filled-button-container-color, #6750a4); }
+}
+
+.remove-btn {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 22px;
+  height: 22px;
+  background: rgba(0,0,0,0.6);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+
+  mat-icon { font-size: 14px; width: 14px; height: 14px; }
+}
+
+.error-msg { color: red; font-size: 0.85rem; margin: 4px 0 0; }

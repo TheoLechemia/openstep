@@ -1,0 +1,59 @@
+<h2 mat-dialog-title>Nouveau voyage</h2>
+
+<mat-dialog-content>
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Nom du voyage</mat-label>
+    <input matInput [(ngModel)]="name" required>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Description</mat-label>
+    <textarea matInput [(ngModel)]="description" rows="3"></textarea>
+  </mat-form-field>
+
+  <div class="date-row">
+    <mat-form-field appearance="outline" class="half-width">
+      <mat-label>Date de début</mat-label>
+      <input matInput [matDatepicker]="pickerStart" [(ngModel)]="startDate" required>
+      <mat-datepicker-toggle matSuffix [for]="pickerStart"></mat-datepicker-toggle>
+      <mat-datepicker #pickerStart></mat-datepicker>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="half-width">
+      <mat-label>Date de fin (optionnel)</mat-label>
+      <input matInput [matDatepicker]="pickerEnd" [(ngModel)]="endDate">
+      <mat-datepicker-toggle matSuffix [for]="pickerEnd"></mat-datepicker-toggle>
+      <mat-datepicker #pickerEnd></mat-datepicker>
+    </mat-form-field>
+  </div>
+
+  <mat-slide-toggle [(ngModel)]="isPublic" class="mb-2">Voyage public</mat-slide-toggle>
+
+  <div class="photo-upload">
+    <label class="photo-label">
+      @if (photoPreview) {
+        <img [src]="photoPreview" class="photo-preview" alt="Aperçu">
+        <span class="change-photo">Changer la photo</span>
+      } @else {
+        <mat-icon class="upload-icon">add_photo_alternate</mat-icon>
+        <span>Ajouter une photo de couverture *</span>
+      }
+      <input type="file" accept="image/*" (change)="onPhotoSelected($event)" hidden>
+    </label>
+  </div>
+
+  @if (error) {
+    <p class="error-msg">{{ error }}</p>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Annuler</button>
+  <button mat-flat-button [disabled]="loading" (click)="submit()">
+    @if (loading) {
+      <mat-progress-spinner diameter="20" mode="indeterminate"></mat-progress-spinner>
+    } @else {
+      Créer le voyage
+    }
+  </button>
+</mat-dialog-actions>

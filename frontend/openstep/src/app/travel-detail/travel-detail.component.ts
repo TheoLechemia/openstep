@@ -1,5 +1,5 @@
-import { Component, Input, ViewChild, ElementRef, CUSTOM_ELEMENTS_SCHEMA, AfterViewInit } from '@angular/core';
-import {  DatePipe } from '@angular/common';
+import { Component, Input, ViewChild, ElementRef, CUSTOM_ELEMENTS_SCHEMA, AfterViewInit, inject } from '@angular/core';
+import { CommonModule, DatePipe } from '@angular/common';
 
 import { MapComponent } from '../map/map.component';
 import { ApiService } from '../api.service';
@@ -11,13 +11,15 @@ import 'leaflet-polylinedecorator';
 import { Router } from '@angular/router';
 import { MapService } from '../map.service';
 import { TravelService } from '../travel.service';
+import { AuthService } from '../auth.service';
+import { StepDialogService } from '../step-dialog.service';
 import { filter } from 'rxjs';
 
 
 @Component({
   selector: 'app-travel-detaisl',
   standalone: true,
-  imports: [MapComponent, MatIcon, MatCardModule, MatButtonModule, MatDividerModule, DatePipe],
+  imports: [CommonModule, MapComponent, MatIcon, MatCardModule, MatButtonModule, MatDividerModule, DatePipe],
   templateUrl: './travel-detail.component.html',
   styleUrl: './travel-detail.component.scss',
   providers: [MapService],
@@ -27,11 +29,13 @@ import { filter } from 'rxjs';
 })
 export class TravelDetailComponent implements AfterViewInit {
   constructor(private _api: ApiService, private _router : Router, public mapService: MapService, 
-    private travelService : TravelService) {}
+    private travelService : TravelService, public auth: AuthService,
+    private _stepDialog: StepDialogService) {}
   @ViewChild('slider') slider: ElementRef;
   public travel: any = {}
   public nonPositionelSteps = []
   public steps: Array<any>;
+
   @Input()
   set uuid(uuidTravel: string) {
     // load travel and store it in travel service
@@ -41,6 +45,12 @@ export class TravelDetailComponent implements AfterViewInit {
         this.travelService.setTravel(travel)
       });
     }
+  }
+
+  get isOwner(): boolean {
+    const user = this.auth.user;
+    if (!user || !this.travel?.owners) return false;
+    return this.travel.owners.includes(user.id);
   }
 
   ngAfterViewInit (): void {
@@ -86,6 +96,11 @@ export class TravelDetailComponent implements AfterViewInit {
     })
   }
 
+  openAddStep(): void {
+    this._stepDialog.openAddStep(this.travel).subscribe(travel => {
+      this.travelService.setTravel(travel);
+    });
+  }
 
   goToDetail(idStep) {
     this._router.navigate(["travel", this.travel.uuid, "step", idStep])

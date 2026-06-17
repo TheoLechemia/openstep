@@ -143,6 +143,35 @@ mar-card-actions {
 
 }
 
+.add-step-card {
+    cursor: pointer;
+    border: 2px dashed rgba(0,0,0,0.2);
+    background: rgba(0,0,0,0.02);
+    transition: border-color 0.2s, background 0.2s;
+
+    &:hover {
+        border-color: var(--mdc-filled-button-container-color, #6750a4);
+        background: rgba(103, 80, 164, 0.05);
+    }
+}
+
+.add-step-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    gap: 12px;
+    color: rgba(0,0,0,0.45);
+    font-size: 0.9rem;
+}
+
+.add-step-icon {
+    font-size: 3rem;
+    width: 3rem;
+    height: 3rem;
+}
+
 
 // swiper-slide {
 //     height: 400px;
