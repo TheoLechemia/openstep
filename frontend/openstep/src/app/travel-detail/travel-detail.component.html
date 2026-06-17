@@ -25,10 +25,11 @@
     class="mySwiper" 
     >
 
+
     @for (step of nonPositionelSteps; track step.id) {
         <swiper-slide class="height-100 ">
-            <mat-card class="step-card height-100 width-100">
-                <img class="step-img" (click)="goToDetail(step.id)" #img mat-card-image src="{{step.properties.first_image?.src}}" alt="">
+            <mat-card class="step-card height-100 width-100" [class.card-unpublished]="!step.properties.published" >
+                <img class="step-img"  (click)="goToDetail(step.id)" #img mat-card-image src="{{step.properties.first_image?.src}}" alt="">
                 <div class="float-info">
                     <div (click)="goToDetail(step.id)"  class="info-overlay">
                         <h4> {{step.properties.name}} </h4>
@@ -37,7 +38,7 @@
                     </div>
                 </div>
 
-                <mat-card-actions>
+                <mat-card-actions [class.card-unpublished]="!step.properties.published" class="card-action">
                     <span id="nb-comments" class="me-4 size">
                         <mat-icon [inline]="true">chat</mat-icon> <span class="text-muted"> {{step.properties.comments.length}} </span> 
                     </span>
@@ -51,11 +52,26 @@
                     <button (click)="mapService.zoomOnLayer(step.id)" mat-mini-fab class="" >
                         <mat-icon  >map</mat-icon>
                     </button>
+                                        @if (isOwner) {
+                                            <button (click)="openEditStep(step)" mat-mini-fab class="ms-2">
+                                                <mat-icon>edit</mat-icon>
+                                            </button>
+                                        }
                     <button style="display: none;"  mat-flat-button>  test</button>
                 </mat-card-actions>
                     
             </mat-card>
         </swiper-slide>
+    }
+    @if (isOwner) {
+      <swiper-slide class="height-100">
+        <mat-card class="step-card height-100 width-100 add-step-card" (click)="openAddStep()">
+          <div class="add-step-inner">
+            <mat-icon class="add-step-icon">add_location_alt</mat-icon>
+            <span>Add a step</span>
+          </div>
+        </mat-card>
+      </swiper-slide>
     }
 
 

@@ -21,3 +21,30 @@ mat-toolbar {
 .example-spacer {
     flex: 1 1 auto;
   }
+
+.avatar-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  overflow: hidden;
+  padding: 0;
+}
+
+.avatar-initials {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: var(--mdc-filled-button-container-color, #6750a4);
+  color: white;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.menu-username {
+  font-weight: 600;
+  opacity: 1 !important;
+  color: inherit;
+}

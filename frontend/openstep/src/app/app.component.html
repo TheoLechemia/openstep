@@ -1,7 +1,30 @@
  <mat-toolbar>
     <span id="app-name" routerLink=""> {{appName}} </span>
     <span class="example-spacer"></span>
-    <button (click)="openDialog()" mat-icon-button class="example-icon favorite-icon icon-text" aria-label="Example icon-button with heart icon">
+
+    @if (auth.user$ | async; as user) {
+      <!-- Logged-in: avatar + dropdown -->
+      <button mat-icon-button [matMenuTriggerFor]="userMenu" class="avatar-btn" aria-label="Menu utilisateur">
+        <span class="avatar-initials">{{ user.username[0] | uppercase }}</span>
+      </button>
+      <mat-menu #userMenu="matMenu">
+        <span mat-menu-item disabled class="menu-username">{{ user.username }}</span>
+        <button mat-menu-item routerLink="/my-travels">
+          <mat-icon>luggage</mat-icon>
+          My travels
+        </button>
+        <button mat-menu-item (click)="logout()">
+          <mat-icon>logout</mat-icon>
+          Logout
+        </button>
+      </mat-menu>
+    } @else {
+      <!-- Not logged in -->
+      <button mat-icon-button (click)="openLogin()" aria-label="Se connecter">
+        <mat-icon>account_circle</mat-icon>
+      </button>
+    }
+    <button (click)="openDialog()" mat-icon-button aria-label="Infos" class="icon-btn">
       <mat-icon>info</mat-icon>
     </button>
   </mat-toolbar>
@@ -10,5 +33,4 @@
   <div id="my-container">
     <router-outlet />
   </div>
-
 

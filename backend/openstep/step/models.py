@@ -65,6 +65,7 @@ class Step(models.Model):
     name = models.CharField(null=True)
     date = DateTimeWithoutTZField()
     positional_step = models.BooleanField(null=False, default=False, verbose_name=_("Positional step"))
+    published = models.BooleanField(null=False, default=True, verbose_name=_("Publier ?"))
     location = models.PointField(srid=4326, verbose_name=_("Location"))
     country = models.CharField(null=True, blank=True)
     state = models.CharField(null=True, blank=True)
@@ -89,7 +90,7 @@ class Step(models.Model):
                 self.country = response.raw["address"].get("country", None)
                 self.state = response.raw["address"].get("state", None)
 
-        super().save(*args, *kwargs)
+        super().save(*args, **kwargs)
 
 
     class Meta:
