@@ -1,4 +1,4 @@
-import { Component, Input, ViewChild, ElementRef, CUSTOM_ELEMENTS_SCHEMA, AfterViewInit, inject } from '@angular/core';
+import { Component, Input, ViewChild, ElementRef, CUSTOM_ELEMENTS_SCHEMA, AfterViewInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 
 import { MapComponent } from '../map/map.component';
@@ -30,7 +30,7 @@ import { filter } from 'rxjs';
 export class TravelDetailComponent implements AfterViewInit {
   constructor(private _api: ApiService, private _router : Router, public mapService: MapService, 
     private travelService : TravelService, public auth: AuthService,
-    private _stepDialog: StepDialogService) {}
+    private _stepDialog: StepDialogService, private _cdr: ChangeDetectorRef) {}
   @ViewChild('slider') slider: ElementRef;
   public travel: any = {}
   public nonPositionelSteps = []
@@ -68,31 +68,32 @@ export class TravelDetailComponent implements AfterViewInit {
       this.mapService.displayTravelLine(travel.steps)
       this.travel = travel;
 
-      const swiperEl = document.querySelector('swiper-container');
-      const swiperParams = {
-        gridRow: 1,
-        mousewheel: true,
-        slidesPerView: 1.5,
-        initialSlide: this.travel.steps.features.length,
-        breakpoints: {
-          640: {
-            slidesPerView: 2.5
+      // Force Angular to render the @for slides before Swiper measures slide widths
+      this._cdr.detectChanges();
+
+      const swiperEl = document.querySelector('swiper-container') as any;
+      if (swiperEl.swiper) {
+        // Already initialized: just update so it recalculates slide widths
+        swiperEl.swiper.update();
+      } else {
+        const swiperParams = {
+          gridRow: 1,
+          mousewheel: true,
+          slidesPerView: 1.5,
+          initialSlide: this.travel.steps.features.length,
+          breakpoints: {
+            640: {
+              slidesPerView: 2.5
+            },
+            1024: {
+              slidesPerView: 5.5,
+            },
           },
-          1024: {
-            slidesPerView: 5.5,
-          },
-        },
-        on: {
-          init() {
-            // ...
-          },
-        },
-      };
-  
-      Object.assign(swiperEl, swiperParams);
-  
-      // and now initialize it
-      swiperEl.initialize();
+        };
+
+        Object.assign(swiperEl, swiperParams);
+        swiperEl.initialize();
+      }
     })
   }
 
