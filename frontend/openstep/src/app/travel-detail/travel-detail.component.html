@@ -52,6 +52,11 @@
                     <button (click)="mapService.zoomOnLayer(step.id)" mat-mini-fab class="" >
                         <mat-icon  >map</mat-icon>
                     </button>
+                                        @if (isOwner) {
+                                            <button (click)="openEditStep(step)" mat-mini-fab class="ms-2">
+                                                <mat-icon>edit</mat-icon>
+                                            </button>
+                                        }
                     <button style="display: none;"  mat-flat-button>  test</button>
                 </mat-card-actions>
                     

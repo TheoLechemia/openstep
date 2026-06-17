@@ -102,6 +102,12 @@ export class TravelDetailComponent implements AfterViewInit {
     });
   }
 
+  openEditStep(step: any): void {
+    this._stepDialog.openEditStep(this.travel, step).subscribe(travel => {
+      this.travelService.setTravel(travel);
+    });
+  }
+
   goToDetail(idStep) {
     this._router.navigate(["travel", this.travel.uuid, "step", idStep])
   }

@@ -1,10 +1,12 @@
-<h2 mat-dialog-title>Nouvelle étape</h2>
+<h2 mat-dialog-title>
+  @if (isEdit) { Éditer l'étape } @else { Nouvelle étape }
+</h2>
 
 <mat-dialog-content>
   <div class="form-columns">
     <!-- Left: fields -->
     <div class="fields-col">
-      <mat-form-field appearance="outline" class="full-width">
+      <mat-form-field appearance="outline" class="full-width mt-2">
         <mat-label>Nom de l'étape</mat-label>
         <input matInput [(ngModel)]="name" required>
       </mat-form-field>
@@ -22,8 +24,12 @@
       </mat-form-field>
 
       <mat-slide-toggle [(ngModel)]="positionalStep" class="mb-2">
-        Étape positionnelle (repère sans contenu)
+        Positional step (a step without content)
       </mat-slide-toggle>
+      
+        <mat-slide-toggle [(ngModel)]="published" class="mb-2">
+          Published
+        </mat-slide-toggle>
 
       <!-- Media upload -->
       <div class="media-section">
@@ -86,7 +92,7 @@
     @if (loading) {
       <mat-progress-spinner diameter="20" mode="indeterminate"></mat-progress-spinner>
     } @else {
-      Créer l'étape
+      @if (isEdit) { Enregistrer } @else { Créer l'étape }
     }
   </button>
 </mat-dialog-actions>

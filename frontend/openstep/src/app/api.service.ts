@@ -36,6 +36,10 @@ export class ApiService {
     return this._http.post<any>(`${this.configService.config.API_ENDPOINT}/steps/`, geojson);
   }
 
+  updateStep(stepId: number, geojson: any): Observable<any> {
+    return this._http.patch<any>(`${this.configService.config.API_ENDPOINT}/steps/${stepId}/`, geojson);
+  }
+
   addMediaToStep(stepId: number, data: FormData): Observable<any> {
     return this._http.post<any>(`${this.configService.config.API_ENDPOINT}/steps/${stepId}/medias/`, data);
   }

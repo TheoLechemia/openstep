@@ -31,4 +31,19 @@ export class StepDialogService {
       }),
     );
   }
+
+  openEditStep(travel: { id: number; uuid: string }, step: any): Observable<any> {
+    const ref = this._dialog.open(CreateStepDialogComponent, {
+      width: '860px',
+      maxWidth: '95vw',
+      data: { travelId: travel.id, travelUuid: travel.uuid, step },
+    });
+
+    return ref.afterClosed().pipe(
+      switchMap(updated => {
+        if (!updated) return EMPTY;
+        return this._api.getTravel(travel.uuid);
+      }),
+    );
+  }
 }

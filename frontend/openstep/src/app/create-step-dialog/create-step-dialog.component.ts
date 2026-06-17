@@ -1,5 +1,5 @@
 import {
-  Component, Inject, AfterViewInit, OnDestroy, ViewChild, ElementRef,
+  Component, Inject, AfterViewInit, OnDestroy, ViewChild, ElementRef, OnInit,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -38,13 +38,14 @@ import { concatMap } from 'rxjs/operators';
   templateUrl: './create-step-dialog.component.html',
   styleUrl: './create-step-dialog.component.scss',
 })
-export class CreateStepDialogComponent implements AfterViewInit, OnDestroy {
+export class CreateStepDialogComponent implements AfterViewInit, OnDestroy, OnInit {
   @ViewChild('locationMap', { static: true }) mapContainer!: ElementRef;
 
   name = '';
   date: Date | null = null;
   description = '';
   positionalStep = false;
+  published = true;
   selectedLat: number | null = null;
   selectedLng: number | null = null;
   mediaFiles: File[] = [];
@@ -56,11 +57,30 @@ export class CreateStepDialogComponent implements AfterViewInit, OnDestroy {
   private _map!: L.Map;
   private _marker: L.Marker | null = null;
 
+  isEdit = false;
+
   constructor(
     private _api: ApiService,
     private _dialogRef: MatDialogRef<CreateStepDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { travelId: number; travelUuid: string }
+    @Inject(MAT_DIALOG_DATA) public data: any
   ) {}
+
+  ngOnInit(): void {
+    if (this.data && this.data.step) {
+      const s = this.data.step;
+      this.isEdit = true;
+      this.name = s.properties.name || '';
+      this.description = s.properties.description || '';
+      this.positionalStep = !!s.properties.positional_step;
+      this.published = s.properties.published !== undefined ? !!s.properties.published : true;
+      // geometry: [lng, lat]
+      if (s.geometry && s.geometry.coordinates) {
+        this.selectedLng = s.geometry.coordinates[0];
+        this.selectedLat = s.geometry.coordinates[1];
+      }
+      this.date = s.properties.date ? new Date(s.properties.date) : null;
+    }
+  }
 
   ngAfterViewInit(): void {
     this._map = L.map(this.mapContainer.nativeElement).setView([20, 0], 2);
@@ -83,6 +103,18 @@ export class CreateStepDialogComponent implements AfterViewInit, OnDestroy {
         });
       }
     });
+
+    // If editing and we have coordinates, add marker and center map
+    if (this.isEdit && this.selectedLat !== null && this.selectedLng !== null) {
+      const latlng = L.latLng(this.selectedLat, this.selectedLng);
+      this._map.setView(latlng, 8);
+      this._marker = L.marker(latlng, { draggable: true }).addTo(this._map);
+      this._marker.on('dragend', (ev: any) => {
+        const pos = ev.target.getLatLng();
+        this.selectedLat = pos.lat;
+        this.selectedLng = pos.lng;
+      });
+    }
   }
 
   ngOnDestroy(): void {
@@ -117,10 +149,10 @@ export class CreateStepDialogComponent implements AfterViewInit, OnDestroy {
   }
 
   submit(): void {
-    if (!this.name) { this.error = 'Le nom est obligatoire.'; return; }
-    if (!this.date) { this.error = 'La date est obligatoire.'; return; }
+    if (!this.name) { this.error = 'Name is mandatory.'; return; }
+    if (!this.date) { this.error = 'Date is mandatory.'; return; }
     if (this.selectedLat === null || this.selectedLng === null) {
-      this.error = 'Cliquez sur la carte pour sélectionner l\'emplacement.';
+      this.error = 'Click on the map to point the step !';
       return;
     }
     this.loading = true;
@@ -136,43 +168,80 @@ export class CreateStepDialogComponent implements AfterViewInit, OnDestroy {
         name: this.name,
         date: this.date.toISOString().split('T')[0] + 'T12:00:00',
         description: this.description,
+          published: this.published,
         travel: this.data.travelId,
         positional_step: this.positionalStep,
       },
     };
-
-    this._api.createStep(geojson).subscribe({
-      next: (step) => {
-        const stepId = step.id;
-        if (this.mediaFiles.length === 0) {
-          this.loading = false;
-          this._dialogRef.close(true);
-          return;
-        }
-        // Upload medias sequentially
-        from(this.mediaFiles).pipe(
-          concatMap((file, index) => {
-            const fd = new FormData();
-            const isVideo = file.type.startsWith('video/');
-            fd.append(isVideo ? 'video_file' : 'image_file', file);
-            if (this.mediaLegends[index]) fd.append('legend', this.mediaLegends[index]);
-            return this._api.addMediaToStep(stepId, fd);
-          })
-        ).subscribe({
-          complete: () => {
+    if (this.isEdit && this.data?.step) {
+      // Update existing step
+      this._api.updateStep(this.data.step.id, geojson).subscribe({
+        next: (step) => {
+          const stepId = step.id;
+          if (this.mediaFiles.length === 0) {
             this.loading = false;
             this._dialogRef.close(true);
-          },
-          error: (err) => {
+            return;
+          }
+          from(this.mediaFiles).pipe(
+            concatMap((file, index) => {
+              const fd = new FormData();
+              const isVideo = file.type.startsWith('video/');
+              fd.append(isVideo ? 'video_file' : 'image_file', file);
+              if (this.mediaLegends[index]) fd.append('legend', this.mediaLegends[index]);
+              return this._api.addMediaToStep(stepId, fd);
+            })
+          ).subscribe({
+            complete: () => {
+              this.loading = false;
+              this._dialogRef.close(true);
+            },
+            error: (err) => {
+              this.loading = false;
+              this.error = 'Étape mise à jour, mais une erreur est survenue lors de l\'upload des médias.';
+            },
+          });
+        },
+        error: (err) => {
+          this.loading = false;
+          this.error = JSON.stringify(err.error) || 'Erreur lors de la mise à jour.';
+        },
+      });
+    } else {
+      // Create new step
+      this._api.createStep(geojson).subscribe({
+        next: (step) => {
+          const stepId = step.id;
+          if (this.mediaFiles.length === 0) {
             this.loading = false;
-            this.error = 'Étape créée, mais une erreur est survenue lors de l\'upload des médias.';
-          },
-        });
-      },
-      error: (err) => {
-        this.loading = false;
-        this.error = JSON.stringify(err.error) || 'Erreur lors de la création.';
-      },
-    });
+            this._dialogRef.close(true);
+            return;
+          }
+          // Upload medias sequentially
+          from(this.mediaFiles).pipe(
+            concatMap((file, index) => {
+              const fd = new FormData();
+              const isVideo = file.type.startsWith('video/');
+              fd.append(isVideo ? 'video_file' : 'image_file', file);
+              if (this.mediaLegends[index]) fd.append('legend', this.mediaLegends[index]);
+              return this._api.addMediaToStep(stepId, fd);
+            })
+          ).subscribe({
+            complete: () => {
+              this.loading = false;
+              this._dialogRef.close(true);
+            },
+            error: (err) => {
+              this.loading = false;
+              this.error = 'Étape créée, mais une erreur est survenue lors de l\'upload des médias.';
+            },
+          });
+        },
+        error: (err) => {
+          this.loading = false;
+          this.error = JSON.stringify(err.error) || 'Erreur lors de la création.';
+        },
+      });
+    }
   }
 }
