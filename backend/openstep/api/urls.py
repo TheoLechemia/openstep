@@ -8,6 +8,7 @@ router = DefaultRouter()
 router.register(r'steps', views.StepViewSet)
 router.register(r'travels', views.TravelViewSet)
 router.register(r'comments', views.CommentiewSet)
+router.register(r'medias', views.MediaViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),

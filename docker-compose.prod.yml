@@ -35,6 +35,12 @@ services:
 
   frontend:
     restart: unless-stopped
+    volumes:
+      # Serve Django static & media files via the nginx container (prod only)
+      - ./backend/openstep/assets:/usr/share/nginx/html/static:ro
+      - ./backend/openstep/assets:/usr/share/nginx/html/media:ro
+    depends_on:
+      - backend
     labels:
       - "traefik.enable=true"
       # Catch-all router for the frontend (Angular SPA + /static/ + /media/)

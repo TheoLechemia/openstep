@@ -1,0 +1,4 @@
+- add browser geolocation in front
+- add wysywig in create step
+- name on comment
+- supprimer step/travel

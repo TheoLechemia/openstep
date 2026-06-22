@@ -51,6 +51,11 @@ export class CreateStepDialogComponent implements AfterViewInit, OnDestroy, OnIn
   mediaFiles: File[] = [];
   mediaPreviews: { url: string; isVideo: boolean }[] = [];
   mediaLegends: string[] = [];
+  // medias that already exist on the server when editing a step
+  existingMedias: { id: number; url: string; isVideo: boolean; legend: string }[] = [];
+  // ids of existing medias that were removed in the UI (note: backend deletion
+  // endpoint is not implemented in the API, so these are tracked client-side)
+  removedExistingMediaIds: number[] = [];
   loading = false;
   error = '';
 
@@ -79,6 +84,15 @@ export class CreateStepDialogComponent implements AfterViewInit, OnDestroy, OnIn
         this.selectedLat = s.geometry.coordinates[1];
       }
       this.date = s.properties.date ? new Date(s.properties.date) : null;
+      // Load existing medias into previews/legends so they appear in the editor
+      if (s.properties && Array.isArray(s.properties.medias)) {
+        s.properties.medias.forEach((m: any) => {
+          const isVideo = m.media_type === 'video';
+          this.existingMedias.push({ id: m.id, url: m.src, isVideo, legend: m.caption || '' });
+          this.mediaPreviews.push({ url: m.src, isVideo });
+          this.mediaLegends.push(m.caption || '');
+        });
+      }
     }
   }
 
@@ -143,7 +157,17 @@ export class CreateStepDialogComponent implements AfterViewInit, OnDestroy, OnIn
   }
 
   removeMedia(index: number): void {
-    this.mediaFiles.splice(index, 1);
+    // If the removed item is one of the existing medias, track its id for
+    // potential deletion and remove it from the existing list.
+    if (index < this.existingMedias.length) {
+      const removed = this.existingMedias.splice(index, 1)[0];
+      if (removed && removed.id) this.removedExistingMediaIds.push(removed.id);
+    } else {
+      // Adjust index relative to new uploads
+      const newIndex = index - this.existingMedias.length;
+      this.mediaFiles.splice(newIndex, 1);
+    }
+    // Remove preview/legend entry in all cases (they are aligned)
     this.mediaPreviews.splice(index, 1);
     this.mediaLegends.splice(index, 1);
   }
@@ -180,8 +204,18 @@ export class CreateStepDialogComponent implements AfterViewInit, OnDestroy, OnIn
         next: (step) => {
           const stepId = step.id;
           if (this.mediaFiles.length === 0) {
-            this.loading = false;
-            this._dialogRef.close(true);
+            if (this.removedExistingMediaIds.length === 0) {
+              this.loading = false;
+              this._dialogRef.close(true);
+              return;
+            }
+            // delete removed existing medias sequentially
+            from(this.removedExistingMediaIds).pipe(
+              concatMap(id => this._api.deleteMedia(id))
+            ).subscribe({
+              complete: () => { this.loading = false; this._dialogRef.close(true); },
+              error: (err) => { this.loading = false; this.error = 'Étape mise à jour, mais une erreur est survenue lors de la suppression des médias.'; }
+            });
             return;
           }
           from(this.mediaFiles).pipe(
@@ -189,13 +223,24 @@ export class CreateStepDialogComponent implements AfterViewInit, OnDestroy, OnIn
               const fd = new FormData();
               const isVideo = file.type.startsWith('video/');
               fd.append(isVideo ? 'video_file' : 'image_file', file);
-              if (this.mediaLegends[index]) fd.append('legend', this.mediaLegends[index]);
+              const legendIndex = this.existingMedias.length + index;
+              if (this.mediaLegends[legendIndex]) fd.append('legend', this.mediaLegends[legendIndex]);
               return this._api.addMediaToStep(stepId, fd);
             })
           ).subscribe({
             complete: () => {
-              this.loading = false;
-              this._dialogRef.close(true);
+              // after uploading new medias, delete any removed existing ones
+              if (this.removedExistingMediaIds.length === 0) {
+                this.loading = false;
+                this._dialogRef.close(true);
+                return;
+              }
+              from(this.removedExistingMediaIds).pipe(
+                concatMap(id => this._api.deleteMedia(id))
+              ).subscribe({
+                complete: () => { this.loading = false; this._dialogRef.close(true); },
+                error: (err) => { this.loading = false; this.error = 'Étape mise à jour, mais une erreur est survenue lors de la suppression des médias.'; }
+              });
             },
             error: (err) => {
               this.loading = false;
@@ -224,13 +269,25 @@ export class CreateStepDialogComponent implements AfterViewInit, OnDestroy, OnIn
               const fd = new FormData();
               const isVideo = file.type.startsWith('video/');
               fd.append(isVideo ? 'video_file' : 'image_file', file);
-              if (this.mediaLegends[index]) fd.append('legend', this.mediaLegends[index]);
+              const legendIndex = this.existingMedias.length + index;
+              if (this.mediaLegends[legendIndex]) fd.append('legend', this.mediaLegends[legendIndex]);
               return this._api.addMediaToStep(stepId, fd);
             })
           ).subscribe({
             complete: () => {
-              this.loading = false;
-              this._dialogRef.close(true);
+              // No existing medias to delete for a freshly created step, but keep the
+              // same flow in case something changed: delete removed ids then close.
+              if (this.removedExistingMediaIds.length === 0) {
+                this.loading = false;
+                this._dialogRef.close(true);
+                return;
+              }
+              from(this.removedExistingMediaIds).pipe(
+                concatMap(id => this._api.deleteMedia(id))
+              ).subscribe({
+                complete: () => { this.loading = false; this._dialogRef.close(true); },
+                error: (err) => { this.loading = false; this.error = 'Étape créée, mais une erreur est survenue lors de la suppression des médias.'; }
+              });
             },
             error: (err) => {
               this.loading = false;

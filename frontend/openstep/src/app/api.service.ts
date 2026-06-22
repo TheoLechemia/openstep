@@ -44,6 +44,10 @@ export class ApiService {
     return this._http.post<any>(`${this.configService.config.API_ENDPOINT}/steps/${stepId}/medias/`, data);
   }
 
+  deleteMedia(mediaId: number): Observable<any> {
+    return this._http.delete<any>(`${this.configService.config.API_ENDPOINT}/medias/${mediaId}/`);
+  }
+
   postComment(data: any): Observable<any> {
     return this._http.post<any>(
       `${this.configService.config.API_ENDPOINT}/comments/`, data)

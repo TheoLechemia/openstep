@@ -39,9 +39,9 @@ services:
     image: ${BACKEND_IMAGE:-ghcr.io/${GITHUB_REPOSITORY:-owner/openstep}-backend:${TAG:-latest}}
     volumes:
       # User-uploaded files shared with the frontend nginx for serving
-      - media_data:/app/assets
+      - ./backend/openstep/assets:/app/assets
       # Collected Django static files shared with the frontend nginx
-      - static_data:/app/staticfiles
+      - ./backend/openstep/staticfiles:/app/staticfiles
     depends_on:
       db:
         condition: service_healthy
@@ -58,20 +58,12 @@ services:
       APP_ENVIRONMENT: ${APP_ENVIRONMENT:-production}
       API_ENDPOINT: ${API_ENDPOINT:-/api}
       APP_NAME: ${APP_NAME:-OpenStep}
-    volumes:
-      # Serve Django static & media files via the nginx container (prod only)
-      - static_data:/usr/share/nginx/html/static:ro
-      - media_data:/usr/share/nginx/html/media:ro
-    depends_on:
-      - backend
     networks:
       - openstep-net
 
 # ── Named volumes ──────────────────────────────────────────────────────────
 volumes:
   postgres_data:
-  media_data:
-  static_data:
 
 # ── Networks ────────────────────────────────────────────────────────────────
 networks:

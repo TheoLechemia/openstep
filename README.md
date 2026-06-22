@@ -41,3 +41,13 @@ Create a django superuser :
 That's it !
 
 ⚠️ the prod deployment has not been tested yet
+
+## Configuration
+
+The configure the application, please edit `backend/openstep/openstep/settings/local.py`.
+
+### Dev :
+
+Run the tests :
+
+     docker compose exec backend python manage.py test

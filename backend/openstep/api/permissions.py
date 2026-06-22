@@ -20,6 +20,12 @@ class TravelOwner(permissions.BasePermission):
         travel = getattr(obj, 'travel', None)
         if travel is not None:
             return request.user.id in travel.owners.values_list('id', flat=True)
+        # Media objects: traverse media -> step -> travel
+        step = getattr(obj, 'step', None)
+        if step is not None:
+            travel = getattr(step, 'travel', None)
+            if travel is not None:
+                return request.user.id in travel.owners.values_list('id', flat=True)
         return False
 
 

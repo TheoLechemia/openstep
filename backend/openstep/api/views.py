@@ -52,6 +52,13 @@ class MediaUploadSerializer(serializers.ModelSerializer):
         fields = ('id', 'legend', 'image_file', 'video_file', 'step')
 
 
+class MediaUpdateSerializer(serializers.ModelSerializer):
+    """Used to update editable fields of an existing Media (legend only)."""
+    class Meta:
+        model = Media
+        fields = ('id', 'legend')
+
+
 class TravelSerializerNoStep(serializers.ModelSerializer):
     class Meta:
         model = Travel
@@ -192,6 +199,29 @@ class StepViewSet(viewsets.ModelViewSet):
                 return qs
             return qs.filter(published=True)
         return qs
+
+
+class MediaViewSet(viewsets.ModelViewSet):
+    """Allows deleting and updating (legend) an existing Media.
+
+    Only owners of the travel the media belongs to may write.
+    """
+    queryset = Media.objects.select_related('step__travel')
+    http_method_names = ['get', 'patch', 'delete', 'head', 'options']
+
+    def get_serializer_class(self):
+        if self.action == 'partial_update':
+            return MediaUpdateSerializer
+        return MediaSerializer
+
+    def get_permissions(self):
+        if self.request.method in SAFE_METHODS:
+            return [AllowAny()]
+        return [IsAuthenticated(), TravelOwner()]
+
+    def perform_destroy(self, instance):
+        instance.delete()
+
 
 class TravelViewSet(viewsets.ModelViewSet):
     # Do not prefetch steps at class level; get_queryset will decide when
