@@ -49,89 +49,22 @@ export class StepDetailComponent implements AfterViewInit  {
   public currentIdtravel: number;
   readonly dialog = inject(MatDialog);
   public commentMessage: string;
+  public commentFrom: string;
   public stepIndexInTravel: number;
   @ViewChild('swiperRef')
   swiperRef: ElementRef | undefined;
   swiper?: Swiper;
+  commentSigners = [
+    "Tralalero Tralala",
+    "Bombardiro Crocodilo",
+    "Ballerina Cappuccina",
+    "Chimpanzini Bananini",
+    "Brr Brr Patapim",
+    "Cappuccino Assassino",
+    "Espressona Signora"
+  ]
 
   ngAfterViewInit(): void {
-
-    // interact('#rotate-area').gesturable({
-    //   onmove: function (event) {
-    //     var arrow = document.getElementById('arrow')
-
-    //     angle += event.da
-
-    //     arrow.style.webkitTransform =
-    //     arrow.style.transform =
-    //       'rotate(' + angle + 'deg)'
-
-    //     document.getElementById('angle-info').textContent =
-    //       angle.toFixed(2) + '\u00b0'
-    //   },
-    // })
-    // const position = { x: 0, y: 0 }
-
-    // let angle = 0
-    // interact('#main').draggable({
-    //     startAxis: 'x',
-    //     lockAxis: 'x',
-    //   listeners: {
-    //     start (event) {
-    //       // console.log(event.type, event.target)
-    //     },
-    //     move (event) {
-    //       console.log("mooove", event);
-
-    //       position.x += event.dx
-    //       position.y += event.dy
-
-    //       // event.target.style.transform =
-    //       //   `translate(${position.x}px, ${position.y}px)`
-    //     },
-
-    //     end(event) {
-    //       console.log("end", event);
-
-    //     }
-    //   }
-    // })
-
-
-    // addEventListener("touchstart", (event) => {
-
-    //   console.log(event);
-
-    // });
-
-    // addEventListener("touchmove", (event) => {
-
-    //   console.log(event);
-
-    // });
-
-    // addEventListener("touchend", (event) => {
-
-    //   console.log("enddd", event);
-    //   console.log(event.changedTouches[0].pageX);
-
-
-    // });
-
-
-    // document.addEventListener('swiped', (e:any) => {
-
-    //   if(e.detail.dir == 'right') {
-    //     const swipe = document.getElementById("left-swipper");
-    //     swipe.style.display = "block"
-    //     setTimeout(() => {
-    //       this.previousStep();
-    //     }, 200);
-    //   }
-    //   if(e.detail.dir == "left") {
-    //     this.nextStep();
-    //   }
-    // });
 
     this._route.params.subscribe(route => {
       const currentUuidTravel = route["uuidTravel"];
@@ -246,13 +179,21 @@ export class StepDetailComponent implements AfterViewInit  {
   }
 
   addComment(){
-    this._api.postComment({
-      "step": this.step.id,
-      "message": this.commentMessage
-    }).subscribe(comment => {
-      this.commentMessage = "";
-      this.step.properties.comments.push(comment)
-    })
+    const from = (this.commentFrom && this.commentFrom.length > 0)
+      ? this.commentFrom
+      : "Anonymous "+this.commentSigners[Math.floor(Math.random() * this.commentSigners.length)];
+
+    const payload = {
+      step: this.step.id,
+      message: this.commentMessage,
+      _from: from
+    };
+
+    this._api.postComment(payload).subscribe(comment => {
+      this.commentMessage = '';
+      this.commentFrom = '';
+      this.step.properties.comments.push(comment);
+    });
   }
 
 }

@@ -168,6 +168,7 @@ class Media(models.Model):
 class Comments(models.Model):
     message = models.TextField()
     date = models.DateTimeField(auto_now=True, blank=True)
+    _from = models.CharField(null=True)
     step = models.ForeignKey(
         Step,
         on_delete=models.CASCADE,
