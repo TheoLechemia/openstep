@@ -9,6 +9,7 @@ from django.conf import settings
 from django.db.models import DateTimeField, Q
 from django.utils.translation import gettext_lazy as _
 from django.utils.timezone import now
+from pathlib import Path
 
 from django_resized import ResizedImageField
 
@@ -151,6 +152,15 @@ class Media(models.Model):
             raise ValidationError(
                 _("Un média doit représenter soit une image soit une vidéo, pas les deux ni aucun.")
             )
+        
+    def delete_file(self):
+        image_or_video = getattr(self, "image_file") if self.media_type == "image" else getattr(self, "video_file")
+        file = Path(image_or_video.path)
+        if file.exists():
+            file.unlink()
+
+
+
 
     class Meta:
         ordering = ["id"]

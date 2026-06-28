@@ -220,7 +220,11 @@ class MediaViewSet(viewsets.ModelViewSet):
         return [IsAuthenticated(), TravelOwner()]
 
     def perform_destroy(self, instance):
-        instance.delete()
+        # delete file
+        instance.delete_file()
+        # delete instance
+        super().perform_destroy(instance)
+
 
 
 class TravelViewSet(viewsets.ModelViewSet):
@@ -233,6 +237,7 @@ class TravelViewSet(viewsets.ModelViewSet):
         if self.action in ('create', 'update', 'partial_update'):
             return TravelWriteSerializer
         return TravelSerializer
+    
 
     def get_permissions(self):
         if self.request.method in SAFE_METHODS:
