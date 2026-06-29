@@ -20,9 +20,7 @@
             "outputPath": "dist/openstep",
             "index": "src/index.html",
             "browser": "src/main.ts",
-            "polyfills": [
-              "zone.js"
-            ],
+            "polyfills": ["zone.js"],
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
@@ -30,6 +28,21 @@
               {
                 "glob": "**/*",
                 "input": "public"
+              },
+              {
+                "glob": "marker-icon.png",
+                "input": "./node_modules/leaflet/dist/images",
+                "output": ""
+              },
+              {
+                "glob": "marker-icon-2x.png",
+                "input": "./node_modules/leaflet/dist/images",
+                "output": ""
+              },
+              {
+                "glob": "marker-shadow.png",
+                "input": "./node_modules/leaflet/dist/images",
+                "output": ""
               },
               {
                 "glob": "**/*",
@@ -40,19 +53,18 @@
                 "glob": "config.json.example",
                 "input": "src/config",
                 "output": "./config"
-             }
+              }
             ],
             "styles": [
               "src/styles.scss",
               "node_modules/leaflet/dist/leaflet.css",
               "node_modules/bootstrap/dist/css/bootstrap.min.css",
               "node_modules/ngx-lightbox/lightbox.css"
-
             ],
             "scripts": [
               "node_modules/swiped-events/dist/swiped-events.min.js",
               "node_modules/leaflet/dist/leaflet.js",
-              "node_modules/leaflet-polylinedecorator/dist/leaflet.polylineDecorator.js",
+              "node_modules/leaflet-polylinedecorator/dist/leaflet.polylineDecorator.js"
             ]
           },
           "configurations": {
@@ -81,7 +93,6 @@
               "extractLicenses": false,
               "sourceMap": true,
               "assets": ["src/config", "src/assets"]
-
             }
           },
           "defaultConfiguration": "production"
@@ -104,10 +115,7 @@
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ],
+            "polyfills": ["zone.js", "zone.js/testing"],
             "tsConfig": "tsconfig.spec.json",
             "inlineStyleLanguage": "scss",
             "assets": [
@@ -116,9 +124,7 @@
                 "input": "public"
               }
             ],
-            "styles": [
-              "src/styles.scss"
-            ],
+            "styles": ["src/styles.scss"],
             "scripts": []
           }
         }
