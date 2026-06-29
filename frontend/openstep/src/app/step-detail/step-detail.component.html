@@ -33,7 +33,7 @@
                                 <mat-icon class="me-1">caflendar_month</mat-icon>
                                 <span> Day {{step.properties.day_of_travel}} - {{step.properties.date  |date: 'dd MMM yyyy' }} </span>
                             </span>
-                            <p class="mt-2 desc" [innerHTML]="step.properties.description" >
+                            <p class="mt-2 desc" style="white-space: pre-line" [innerHTML]="step.properties.description" >
                             <p style="display: none;">medias</p>
                         </div>
                         <!-- No loop no working... -->
