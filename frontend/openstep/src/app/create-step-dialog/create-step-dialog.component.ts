@@ -58,6 +58,7 @@ export class CreateStepDialogComponent implements AfterViewInit, OnDestroy, OnIn
   removedExistingMediaIds: number[] = [];
   loading = false;
   error = '';
+  geoLocating = false;
 
   private _map!: L.Map;
   private _marker: L.Marker | null = null;
@@ -129,6 +130,50 @@ export class CreateStepDialogComponent implements AfterViewInit, OnDestroy, OnIn
         this.selectedLng = pos.lng;
       });
     }
+  }
+
+  setMarkerAt(lat: number, lng: number) {
+    const latlng = L.latLng(lat, lng);
+    this._map.setView(latlng, 12);
+    this.selectedLat = lat;
+    this.selectedLng = lng;
+    if (this._marker) {
+      this._marker.setLatLng(latlng);
+    } else {
+      this._marker = L.marker(latlng, { draggable: true }).addTo(this._map);
+      this._marker.on('dragend', (ev: any) => {
+        const pos = ev.target.getLatLng();
+        this.selectedLat = pos.lat;
+        this.selectedLng = pos.lng;
+      });
+    }
+  }
+
+  useMyLocation(): void {
+    this.error = '';
+    this.geoLocating = true;
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+        this.setMarkerAt(lat, lng);
+        this.geoLocating = false;
+      },
+      (err) => {
+        this.geoLocating = false;
+        switch (err.code) {
+          case err.PERMISSION_DENIED:
+            this.error = 'Autorisation de géolocalisation refusée.'; break;
+          case err.POSITION_UNAVAILABLE:
+            this.error = 'Position non disponible.'; break;
+          case err.TIMEOUT:
+            this.error = 'Délai de géolocalisation dépassé.'; break;
+          default:
+            this.error = 'Erreur lors de la géolocalisation.';
+        }
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
   }
 
   ngOnDestroy(): void {

@@ -66,10 +66,13 @@
 
     <!-- Right: map -->
     <div class="map-col">
-      <p class="map-hint">
-        <mat-icon inline>touch_app</mat-icon>
-        Cliquez sur la carte pour placer l'étape
-      </p>
+
+      <div class="map-actions">
+        <button mat-stroked-button color="primary" (click)="useMyLocation()" [disabled]="geoLocating">
+          <mat-icon>my_location</mat-icon>
+          @if (geoLocating) { <mat-progress-spinner diameter="18" mode="indeterminate"></mat-progress-spinner> } @else { My position }
+        </button>
+      </div>
       <div #locationMap class="location-map"></div>
       @if (selectedLat !== null) {
         <p class="coords-info">

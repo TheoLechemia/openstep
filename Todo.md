@@ -1,4 +1,2 @@
-- add browser geolocation in front
-- add wysywig in create step
 - supprimer step/travel
 - ajuster la taille des images sur la fiche step
