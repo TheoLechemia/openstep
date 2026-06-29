@@ -147,7 +147,6 @@ TINYMCE_JS_URL = os.path.join(STATIC_URL, "tinymce/tinymce.min.js")
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
     ],
     # Read-only for anonymous users, authenticated users obey model permissions.
     'DEFAULT_PERMISSION_CLASSES': [
