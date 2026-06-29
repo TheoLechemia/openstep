@@ -263,7 +263,7 @@ class TravelViewSet(viewsets.ModelViewSet):
 
             # Authenticated users: include unpublished steps only for travels
             # they own (otherwise only published steps).
-            steps_qs = Step.objects.filter(Q(published=True) | Q(travel__owners__id=self.request.user.id))
+            steps_qs = Step.objects.filter(Q(published=True) | Q(travel__owners__id=self.request.user.id)).distinct()
             return queryset.prefetch_related(Prefetch('steps', queryset=steps_qs))
 
         return queryset

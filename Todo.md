@@ -1,2 +1,3 @@
 - supprimer step/travel
 - ajuster la taille des images sur la fiche step
+- lister les voyage dont on est propriétaire meme s'ils sont privé sur la page /travels
