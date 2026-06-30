@@ -14,7 +14,18 @@ mat-toolbar {
 }
 
 #app-name {
-    cursor: pointer;
+  cursor: pointer;
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-size: 1.8rem;
+  color: var(--mdc-filled-button-container-color);
+}
+
+.app-icon {
+  margin-right: 8px;
+  vertical-align: middle;
+  font-size: 24px;
+  color: var(--mdc-filled-button-container-color);
 }
 
 
