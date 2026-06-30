@@ -1,29 +1,42 @@
 
-  
     <div class="row g-0 page-container .height-100 ">
       <div id="map-container" class="col-12 col-md-9 order-md-2">
         <app-map [geojson]="geojson?.features" [pointToLayer]="pointToLayer.bind(this)" ></app-map>
       </div>
-      <div id="list-container" class="col-12 col-md-3 order-md-1">
-        <!-- le track reste sur id (identité interne stable) ; les liens utilisent uuid volontairement -->
-        @for (travel of travels; track travel.id) {
-
-          <a [routerLink]="['travel', travel.uuid]" routerLinkActive="active">
-            <div class="travel-container mt-2 p-2" >
-              <div class="img-container" style="background-image: url({{travel.main_photo}});">
-                
-              </div>
-    
-              <div class="overlay p-2">
-                <div class="info-overlay">
-                  <h2> {{travel.name}} </h2>
-                  <p> {{travel.description}} </p>
-
+      <div id="list-container" class="col-12 col-md-3 order-md-1 p-2">
+        <!-- Utilise le style de carte similaire à my-travels -->
+        @for (travel of travels; track travel.uuid) {
+            <mat-card class="travel-card mt-2" (click)="goToTravel(travel.uuid)">
+              @if (travel.main_photo) {
+                <img mat-card-image [src]="travel.main_photo" [alt]="travel.name" class="card-img">
+              }
+              <mat-card-content>
+                <h2 class="travel-name">{{ travel.name }}</h2>
+                <p class="travel-desc">{{ travel.description }}</p>
+                <div class="travel-meta">
+                  <span>
+                    <mat-icon inline>calendar_month</mat-icon>
+                    {{ travel.start_date | date:'mediumDate' }}
+                  </span>
+                  <span>
+                    <mat-icon inline>photo_camera</mat-icon>
+                    {{ travel.steps?.features?.length || 0 }} étape(s)
+                  </span>
+                  <span class="visibility-badge" [class.public]="travel.is_public">
+                    <mat-icon inline>{{ travel.is_public ? 'public' : 'lock' }}</mat-icon>
+                    {{ travel.is_public ? 'Public' : 'Privé' }}
+                  </span>
                 </div>
-              </div>
-  
-            </div>
-          </a>
+              </mat-card-content>
+              <mat-card-actions (click)="$event.stopPropagation()">
+                <button mat-button [routerLink]="['/travel', travel.uuid]">
+                  <mat-icon>open_in_new</mat-icon> See
+                </button>
+                <button mat-button (click)="$event.stopPropagation(); copyShareLink(travel)">
+                  <mat-icon>share</mat-icon> Share
+                </button>
+              </mat-card-actions>
+            </mat-card>
         }
       </div>
     </div>

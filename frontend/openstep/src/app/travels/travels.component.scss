@@ -20,14 +20,16 @@
 }
 
 
-
-
-
 .travel-container {
     // width: 200px;
     position: relative;
     max-height: 400px;
     text-align: center;
+}
+
+.card-img {
+  height: 180px;
+  object-fit: cover;
 }
 
 .page-container {
@@ -53,4 +55,31 @@
     bottom: 0;
     left: 50%;
     transform: translate(-50%, -50%);
+}
+
+.visibility-badge {
+  border-radius: 12px;
+  padding: 2px 8px;
+  background: rgba(0,0,0,0.08);
+
+  &.public {
+    background: rgba(76, 175, 80, 0.12);
+    color: #2e7d32;
+  }
+}
+
+.travel-card {
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 10px rgba(0,0,0,0.15);
+  }
+}
+
+.travel-name {
+  margin: 8px 0 4px;
+  font-size: 1.1rem;
+  font-weight: 600;
 }
