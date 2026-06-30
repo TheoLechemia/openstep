@@ -251,10 +251,14 @@ class TravelViewSet(viewsets.ModelViewSet):
         # For list view: only show public travels. Also prefetch steps
         # according to authentication (anonymous -> only published steps).
         if self.action == 'list':
+            # Authenticated users: show public travels + those they own (even if private)
+            if self.request.user and self.request.user.is_authenticated:
+                return queryset.filter(Q(is_public=True) | Q(owners__id=self.request.user.id)).distinct()
+            # Anonymous users: only public travels
             return queryset.filter(is_public=True)
 
 
-        # For retrieve view: prefetch steps, but for anonymous users only
+        # For retrieve view (get one): prefetch steps, but for anonymous users only
         # include published steps.
         if self.action == 'retrieve':
             # Anonymous users: only published steps.
@@ -264,6 +268,7 @@ class TravelViewSet(viewsets.ModelViewSet):
             # Authenticated users: include unpublished steps only for travels
             # they own (otherwise only published steps).
             steps_qs = Step.objects.filter(Q(published=True) | Q(travel__owners__id=self.request.user.id)).distinct()
+
             return queryset.prefetch_related(Prefetch('steps', queryset=steps_qs))
 
         return queryset
